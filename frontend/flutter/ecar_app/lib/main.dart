@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/home_screen.dart';
 import 'services/auth_service.dart';
 
 void main() {
@@ -108,7 +109,7 @@ class ECarApp extends StatelessWidget {
             final bool isLoggedIn = snapshot.data ?? false;
             if (isLoggedIn) {
               // Navigate to home screen
-              return const SplashScreen(); // Replace with HomeScreen later
+              return const HomeScreen(); // Changed from SplashScreen to HomeScreen
             } else {
               return const LoginScreen();
             }

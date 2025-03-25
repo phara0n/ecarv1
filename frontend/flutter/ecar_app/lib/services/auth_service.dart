@@ -43,7 +43,7 @@ class AuthService {
     return token != null;
   }
   
-  Future<Customer> getCurrentCustomer() async {
+  Future<Customer> getCurrentUser() async {
     final token = await getToken();
     if (token == null) {
       throw Exception('Not authenticated');
