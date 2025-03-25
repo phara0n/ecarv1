@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../services/auth_service.dart';
 import 'dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -16,6 +17,9 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
   String? _errorMessage;
+  
+  // Add AuthService instance
+  final _authService = AuthService();
 
   @override
   void dispose() {
@@ -32,18 +36,18 @@ class _LoginScreenState extends State<LoginScreen> {
       });
 
       try {
-        // TODO: Implement actual authentication with backend
-        // Simulating network delay
-        await Future.delayed(const Duration(seconds: 1));
+        // Use the actual AuthService login method
+        final success = await _authService.login(
+          _emailController.text,
+          _passwordController.text,
+        );
         
-        // For demo purposes, allow login with any admin@ecar.tn email
-        if (_emailController.text.endsWith('@ecar.tn')) {
-          if (mounted) {
-            Navigator.of(context).pushReplacementNamed('/dashboard');
-          }
+        if (success && mounted) {
+          Navigator.of(context).pushReplacementNamed('/dashboard');
         } else {
+          // This should not happen due to exception handling in AuthService
           setState(() {
-            _errorMessage = 'Invalid admin credentials';
+            _errorMessage = 'Login failed. Please try again.';
             _isLoading = false;
           });
         }
