@@ -1,0 +1,90 @@
+{
+  "@@locale": "ar",
+  
+  "appTitle": "تطبيق إدارة ورشة السيارات",
+  "welcomeMessage": "مرحباً بك في تطبيق إدارة ورشة السيارات",
+  
+  "loginTitle": "تسجيل الدخول",
+  "username": "اسم المستخدم",
+  "password": "كلمة المرور",
+  "loginButton": "تسجيل الدخول",
+  "forgotPassword": "نسيت كلمة المرور؟",
+  "loginError": "اسم المستخدم أو كلمة المرور غير صحيحة",
+  
+  "homeTitle": "الصفحة الرئيسية",
+  "myVehicles": "سياراتي",
+  "repairHistory": "سجل الإصلاحات",
+  "invoices": "الفواتير",
+  "profile": "الملف الشخصي",
+  
+  "vehicleDetails": "تفاصيل السيارة",
+  "addVehicle": "إضافة سيارة",
+  "editVehicle": "تعديل بيانات السيارة",
+  "brand": "الماركة",
+  "model": "الطراز",
+  "year": "سنة الصنع",
+  "licensePlate": "رقم اللوحة",
+  "vin": "رقم الهيكل",
+  "currentMileage": "عداد المسافات الحالي",
+  "updateMileage": "تحديث عداد المسافات",
+  "lastService": "آخر صيانة",
+  "nextService": "الصيانة القادمة",
+  "saveButton": "حفظ",
+  "cancelButton": "إلغاء",
+  
+  "repairDetailsTitle": "تفاصيل الإصلاح",
+  "repairDate": "تاريخ الإصلاح",
+  "repairDescription": "وصف الإصلاح",
+  "repairStatus": "حالة الإصلاح",
+  "repairCost": "تكلفة الإصلاح",
+  "technicianName": "اسم الفني",
+  "partsReplaced": "القطع المستبدلة",
+  
+  "invoiceDetailsTitle": "تفاصيل الفاتورة",
+  "invoiceNumber": "رقم الفاتورة",
+  "invoiceDate": "تاريخ الفاتورة",
+  "invoiceAmount": "قيمة الفاتورة",
+  "paymentStatus": "حالة الدفع",
+  "downloadInvoice": "تحميل الفاتورة",
+  "paid": "مدفوعة",
+  "unpaid": "غير مدفوعة",
+  "partial": "مدفوعة جزئياً",
+  
+  "profileTitle": "الملف الشخصي",
+  "fullName": "الاسم الكامل",
+  "email": "البريد الإلكتروني",
+  "phone": "رقم الهاتف",
+  "address": "العنوان",
+  "updateProfile": "تحديث الملف الشخصي",
+  "changePassword": "تغيير كلمة المرور",
+  "logout": "تسجيل الخروج",
+  
+  "notificationsTitle": "الإشعارات",
+  "noNotifications": "لا توجد إشعارات",
+  "markAllAsRead": "تعيين الكل كمقروء",
+  
+  "settingsTitle": "الإعدادات",
+  "language": "اللغة",
+  "darkMode": "الوضع الداكن",
+  "notifications": "الإشعارات",
+  "about": "حول التطبيق",
+  
+  "errorTitle": "خطأ",
+  "errorMessage": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+  "networkError": "خطأ في الاتصال بالشبكة",
+  "tryAgain": "حاول مرة أخرى",
+  
+  "emptyVehicleList": "لا توجد سيارات. أضف سيارتك الأولى.",
+  "emptyRepairList": "لا توجد إصلاحات لهذه السيارة",
+  "emptyInvoiceList": "لا توجد فواتير",
+  
+  "loading": "جاري التحميل...",
+  
+  "currency": "د.ت",
+  "distance": "كم",
+  
+  "statusPending": "قيد الانتظار",
+  "statusInProgress": "قيد التنفيذ",
+  "statusCompleted": "مكتمل",
+  "statusCancelled": "ملغي"
+} 

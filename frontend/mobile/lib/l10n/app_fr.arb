@@ -1,0 +1,90 @@
+{
+  "@@locale": "fr",
+  
+  "appTitle": "Application de Gestion de Garage",
+  "welcomeMessage": "Bienvenue dans l'Application de Gestion de Garage",
+  
+  "loginTitle": "Connexion",
+  "username": "Nom d'utilisateur",
+  "password": "Mot de passe",
+  "loginButton": "Se connecter",
+  "forgotPassword": "Mot de passe oublié ?",
+  "loginError": "Nom d'utilisateur ou mot de passe incorrect",
+  
+  "homeTitle": "Accueil",
+  "myVehicles": "Mes véhicules",
+  "repairHistory": "Historique des réparations",
+  "invoices": "Factures",
+  "profile": "Profil",
+  
+  "vehicleDetails": "Détails du véhicule",
+  "addVehicle": "Ajouter un véhicule",
+  "editVehicle": "Modifier le véhicule",
+  "brand": "Marque",
+  "model": "Modèle",
+  "year": "Année",
+  "licensePlate": "Plaque d'immatriculation",
+  "vin": "Numéro de châssis",
+  "currentMileage": "Kilométrage actuel",
+  "updateMileage": "Mettre à jour le kilométrage",
+  "lastService": "Dernier entretien",
+  "nextService": "Prochain entretien",
+  "saveButton": "Enregistrer",
+  "cancelButton": "Annuler",
+  
+  "repairDetailsTitle": "Détails de la réparation",
+  "repairDate": "Date de réparation",
+  "repairDescription": "Description de la réparation",
+  "repairStatus": "Statut de la réparation",
+  "repairCost": "Coût de la réparation",
+  "technicianName": "Nom du technicien",
+  "partsReplaced": "Pièces remplacées",
+  
+  "invoiceDetailsTitle": "Détails de la facture",
+  "invoiceNumber": "Numéro de facture",
+  "invoiceDate": "Date de facturation",
+  "invoiceAmount": "Montant de la facture",
+  "paymentStatus": "Statut du paiement",
+  "downloadInvoice": "Télécharger la facture",
+  "paid": "Payé",
+  "unpaid": "Non payé",
+  "partial": "Partiellement payé",
+  
+  "profileTitle": "Profil",
+  "fullName": "Nom complet",
+  "email": "Email",
+  "phone": "Téléphone",
+  "address": "Adresse",
+  "updateProfile": "Mettre à jour le profil",
+  "changePassword": "Changer le mot de passe",
+  "logout": "Déconnexion",
+  
+  "notificationsTitle": "Notifications",
+  "noNotifications": "Aucune notification",
+  "markAllAsRead": "Tout marquer comme lu",
+  
+  "settingsTitle": "Paramètres",
+  "language": "Langue",
+  "darkMode": "Mode sombre",
+  "notifications": "Notifications",
+  "about": "À propos",
+  
+  "errorTitle": "Erreur",
+  "errorMessage": "Une erreur s'est produite. Veuillez réessayer.",
+  "networkError": "Erreur de connexion réseau",
+  "tryAgain": "Réessayer",
+  
+  "emptyVehicleList": "Aucun véhicule. Ajoutez votre premier véhicule.",
+  "emptyRepairList": "Aucune réparation pour ce véhicule",
+  "emptyInvoiceList": "Aucune facture disponible",
+  
+  "loading": "Chargement...",
+  
+  "currency": "TND",
+  "distance": "km",
+  
+  "statusPending": "En attente",
+  "statusInProgress": "En cours",
+  "statusCompleted": "Terminé",
+  "statusCancelled": "Annulé"
+} 

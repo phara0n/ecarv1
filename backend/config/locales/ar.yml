@@ -1,0 +1,180 @@
+ar:
+  # Rails model translations
+  activerecord:
+    models:
+      user: "مستخدم"
+      customer: "عميل"
+      vehicle: "سيارة"
+      repair: "إصلاح"
+      invoice: "فاتورة"
+    attributes:
+      user:
+        email: "البريد الإلكتروني"
+        password: "كلمة المرور"
+        full_name: "الاسم الكامل"
+        phone: "رقم الهاتف"
+        role: "الدور"
+      customer:
+        email: "البريد الإلكتروني"
+        password: "كلمة المرور"
+        full_name: "الاسم الكامل"
+        phone: "رقم الهاتف"
+        address: "العنوان"
+        national_id: "بطاقة الهوية"
+      vehicle:
+        brand: "الماركة"
+        model: "الطراز"
+        year: "سنة الصنع"
+        license_plate: "رقم اللوحة"
+        vin: "رقم الهيكل"
+        current_mileage: "عداد المسافات الحالي"
+        last_service_date: "تاريخ آخر صيانة"
+        next_service_date: "تاريخ الصيانة القادمة"
+        next_service_mileage: "عداد المسافات للصيانة القادمة"
+      repair:
+        description: "الوصف"
+        status: "الحالة"
+        cost: "التكلفة"
+        start_date: "تاريخ البدء"
+        completion_date: "تاريخ الانتهاء"
+        technician_name: "اسم الفني"
+        parts_replaced: "القطع المستبدلة"
+      invoice:
+        invoice_number: "رقم الفاتورة"
+        amount: "المبلغ"
+        issue_date: "تاريخ الإصدار"
+        due_date: "تاريخ الاستحقاق"
+        payment_status: "حالة الدفع"
+        payment_method: "طريقة الدفع"
+        tax_amount: "قيمة الضريبة"
+        
+  # Validation messages
+  errors:
+    messages:
+      blank: "لا يمكن أن يكون فارغا"
+      invalid: "غير صالح"
+      taken: "محجوز بالفعل"
+      too_short: "قصير جدا (الحد الأدنى هو %{count} حرفا)"
+      too_long: "طويل جدا (الحد الأقصى هو %{count} حرفا)"
+      confirmation: "غير متطابق"
+      not_a_number: "ليس رقما"
+      greater_than: "يجب أن يكون أكبر من %{count}"
+      not_found: "غير موجود"
+      
+  # Controller messages
+  controllers:
+    application:
+      unauthorized: "غير مصرح بالوصول"
+    sessions:
+      created: "تم تسجيل الدخول بنجاح"
+      destroyed: "تم تسجيل الخروج بنجاح"
+      invalid_credentials: "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+    customers:
+      created: "تم إنشاء العميل بنجاح"
+      updated: "تم تحديث بيانات العميل بنجاح"
+      destroyed: "تم حذف العميل بنجاح"
+    vehicles:
+      created: "تم إضافة السيارة بنجاح"
+      updated: "تم تحديث بيانات السيارة بنجاح"
+      destroyed: "تم حذف السيارة بنجاح"
+      mileage_updated: "تم تحديث عداد المسافات بنجاح"
+    repairs:
+      created: "تم إضافة الإصلاح بنجاح"
+      updated: "تم تحديث بيانات الإصلاح بنجاح"
+      destroyed: "تم حذف الإصلاح بنجاح"
+      status_updated: "تم تحديث حالة الإصلاح بنجاح"
+    invoices:
+      created: "تم إنشاء الفاتورة بنجاح"
+      updated: "تم تحديث بيانات الفاتورة بنجاح"
+      destroyed: "تم حذف الفاتورة بنجاح"
+      payment_updated: "تم تحديث حالة الدفع بنجاح"
+      
+  # API responses
+  api:
+    messages:
+      success: "تمت العملية بنجاح"
+      error: "حدث خطأ"
+      not_found: "لم يتم العثور على البيانات المطلوبة"
+      unauthorized: "غير مصرح بالوصول"
+      validation_error: "خطأ في البيانات المدخلة"
+      server_error: "خطأ في الخادم"
+      
+  # Enums
+  enums:
+    repair:
+      status:
+        pending: "قيد الانتظار"
+        in_progress: "قيد التنفيذ"
+        completed: "مكتمل"
+        cancelled: "ملغي"
+    invoice:
+      payment_status:
+        paid: "مدفوعة"
+        unpaid: "غير مدفوعة"
+        partial: "مدفوعة جزئيا"
+      payment_method:
+        cash: "نقدي"
+        credit_card: "بطاقة ائتمان"
+        bank_transfer: "حوالة بنكية"
+        
+  # Notifications
+  notifications:
+    repair:
+      status_changed: "تم تغيير حالة الإصلاح الخاص بك إلى %{status}"
+      completed: "تم الانتهاء من إصلاح سيارتك ويمكنك استلامها الآن"
+    invoice:
+      created: "تم إصدار فاتورة جديدة بقيمة %{amount} د.ت"
+      payment_due: "يرجى العلم أن موعد استحقاق الفاتورة رقم %{invoice_number} هو غدا"
+    vehicle:
+      service_due: "حان موعد الصيانة الدورية لسيارتك %{brand} %{model}"
+      
+  # Admin interface
+  admin:
+    dashboard:
+      title: "لوحة التحكم"
+      customers: "العملاء"
+      vehicles: "السيارات"
+      repairs: "الإصلاحات"
+      invoices: "الفواتير"
+      revenue: "الإيرادات"
+      pending_repairs: "الإصلاحات قيد الانتظار"
+    menu:
+      dashboard: "لوحة التحكم"
+      customers: "العملاء"
+      vehicles: "السيارات"
+      repairs: "الإصلاحات"
+      invoices: "الفواتير"
+      users: "المستخدمون"
+      reports: "التقارير"
+      settings: "الإعدادات"
+    actions:
+      add: "إضافة"
+      edit: "تعديل"
+      delete: "حذف"
+      view: "عرض"
+      search: "بحث"
+      filter: "تصفية"
+      export: "تصدير"
+      print: "طباعة"
+      
+  # Date and time formats
+  date:
+    formats:
+      default: "%d/%m/%Y"
+      long: "%d %B %Y"
+      short: "%d %b"
+  time:
+    formats:
+      default: "%H:%M:%S"
+      long: "%d %B %Y %H:%M"
+      short: "%d %b %H:%M"
+      
+  # Number formats
+  number:
+    currency:
+      format:
+        unit: "د.ت"
+        precision: 3
+        separator: "."
+        delimiter: ","
+        format: "%n %u" 

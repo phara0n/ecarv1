@@ -1,0 +1,90 @@
+{
+  "@@locale": "ar_TN",
+  
+  "appTitle": "تطبيق حانوت الكرهبة",
+  "welcomeMessage": "مرحبا بيك في تطبيق حانوت الكرهبة",
+  
+  "loginTitle": "دخّل",
+  "username": "اسم المستعمل",
+  "password": "كلمة السر",
+  "loginButton": "دخّل",
+  "forgotPassword": "نسيت كلمة السر؟",
+  "loginError": "اسم المستعمل ولا كلمة السر غالطة",
+  
+  "homeTitle": "الرئيسية",
+  "myVehicles": "كرهباتي",
+  "repairHistory": "تاريخ الصلاحات",
+  "invoices": "الفكتورات",
+  "profile": "بروفيل",
+  
+  "vehicleDetails": "تفاصيل الكرهبة",
+  "addVehicle": "زيد كرهبة",
+  "editVehicle": "بدّل في الكرهبة",
+  "brand": "الماركة",
+  "model": "الموديل",
+  "year": "العام",
+  "licensePlate": "نمرة التسجيل",
+  "vin": "رقم الشاسي",
+  "currentMileage": "الكيلومتراج الحالي",
+  "updateMileage": "جدّد الكيلومتراج",
+  "lastService": "آخر صيانة",
+  "nextService": "الصيانة الجاية",
+  "saveButton": "سجّل",
+  "cancelButton": "بطّل",
+  
+  "repairDetailsTitle": "تفاصيل الصلاح",
+  "repairDate": "تاريخ الصلاح",
+  "repairDescription": "وصف الصلاح",
+  "repairStatus": "حالة الصلاح",
+  "repairCost": "ثمن الصلاح",
+  "technicianName": "اسم الميكانيكي",
+  "partsReplaced": "القطع المبدّلة",
+  
+  "invoiceDetailsTitle": "تفاصيل الفكتورة",
+  "invoiceNumber": "نمرة الفكتورة",
+  "invoiceDate": "تاريخ الفكتورة",
+  "invoiceAmount": "قيمة الفكتورة",
+  "paymentStatus": "حالة الخلاص",
+  "downloadInvoice": "حمّل الفكتورة",
+  "paid": "مخلّصة",
+  "unpaid": "مش مخلّصة",
+  "partial": "مخلّصة بالنص",
+  
+  "profileTitle": "البروفيل",
+  "fullName": "الاسم الكامل",
+  "email": "الإيمايل",
+  "phone": "النمرة",
+  "address": "العنوان",
+  "updateProfile": "جدّد البروفيل",
+  "changePassword": "بدّل كلمة السر",
+  "logout": "اخرج",
+  
+  "notificationsTitle": "الإشعارات",
+  "noNotifications": "مافمّاش إشعارات",
+  "markAllAsRead": "علّم الكل كمقري",
+  
+  "settingsTitle": "الإعدادات",
+  "language": "اللغة",
+  "darkMode": "الموضوع المظلم",
+  "notifications": "الإشعارات",
+  "about": "على التطبيق",
+  
+  "errorTitle": "غلطة",
+  "errorMessage": "صارت غلطة. عاود المحاولة.",
+  "networkError": "مشكلة في الإنترنت",
+  "tryAgain": "عاود جرّب",
+  
+  "emptyVehicleList": "مافمّاش كرهبات. زيد أول كرهبة متاعك.",
+  "emptyRepairList": "مافمّاش صلاحات للكرهبة هاذي",
+  "emptyInvoiceList": "مافمّاش فكتورات",
+  
+  "loading": "استنَ شوية...",
+  
+  "currency": "دينار",
+  "distance": "كم",
+  
+  "statusPending": "في الانتظار",
+  "statusInProgress": "قاعدين يخدمو فيها",
+  "statusCompleted": "تصلحت",
+  "statusCancelled": "ملغية"
+} 
