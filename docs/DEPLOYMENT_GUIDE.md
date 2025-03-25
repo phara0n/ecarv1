@@ -9,6 +9,15 @@ This guide explains how to deploy the eCar Garage Management Application using e
 - Domain names configured in DNS (api.ecar.tn and admin.ecar.tn)
 - Open ports: 80, 443
 
+## SSL Certificates with Let's Encrypt
+
+Both deployment methods use **Let's Encrypt** to automatically obtain and renew SSL certificates. This ensures:
+- Free, trusted SSL certificates
+- Automatic renewal every 90 days
+- HTTPS for secure communication between clients and servers
+
+Let's Encrypt is integrated into the deployment scripts, so no manual certificate management is required.
+
 ## Option 1: Docker Deployment
 
 The Docker deployment method is recommended for most environments as it ensures consistent setup across different servers.
