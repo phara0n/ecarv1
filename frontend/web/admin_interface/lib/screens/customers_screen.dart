@@ -5,157 +5,336 @@ import 'package:responsive_framework/responsive_framework.dart';
 import '../models/customer.dart';
 import '../services/customer_service.dart';
 import '../widgets/loading_indicator.dart';
+import 'package:intl/intl.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:data_table_2/data_table_2.dart';
+import '../widgets/stat_card.dart';
 
 class CustomersScreen extends StatefulWidget {
   const CustomersScreen({Key? key}) : super(key: key);
 
   @override
-  State<CustomersScreen> createState() => _CustomersScreenState();
+  _CustomersScreenState createState() => _CustomersScreenState();
 }
 
-class _CustomersScreenState extends State<CustomersScreen> {
+class _CustomersScreenState extends State<CustomersScreen> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   final CustomerService _customerService = CustomerService();
-  final _searchController = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
   
-  // Customer form controllers
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _addressController = TextEditingController();
+  // State for the customer overview
+  bool _isLoadingStats = true;
+  Map<String, dynamic> _statistics = {};
   
+  // State for the customer list
+  bool _isLoadingCustomers = true;
   List<Customer> _customers = [];
+  int _totalCustomers = 0;
   int _currentPage = 1;
-  int _totalPages = 1;
   int _perPage = 10;
-  int _total = 0;
-  bool _isLoading = false;
-  bool _isEditing = false;
-  int? _editingCustomerId;
+  int _totalPages = 1;
+  String? _searchQuery;
+  bool? _isActiveFilter;
   String? _sortBy = 'name';
   bool _sortAsc = true;
+  
+  // State for the customer form
+  final _formKey = GlobalKey<FormState>();
+  String _formName = '';
+  String _formEmail = '';
+  String _formPhone = '';
+  String _formAddress = '';
+  String _formCity = '';
+  String _formPostalCode = '';
+  String _formNotes = '';
+  bool _formIsActive = true;
   
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _loadStatistics();
     _loadCustomers();
   }
   
   @override
   void dispose() {
-    _searchController.dispose();
-    _nameController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
+    _tabController.dispose();
     super.dispose();
   }
   
+  // Load statistics for the overview tab
+  Future<void> _loadStatistics() async {
+    setState(() {
+      _isLoadingStats = true;
+    });
+    
+    try {
+      final stats = await _customerService.getCustomerStatistics();
+      setState(() {
+        _statistics = stats;
+        _isLoadingStats = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoadingStats = false;
+      });
+      _showSnackBar('Failed to load customer statistics: ${e.toString()}');
+    }
+  }
+  
+  // Load customers for the list tab
   Future<void> _loadCustomers() async {
     setState(() {
-      _isLoading = true;
+      _isLoadingCustomers = true;
     });
     
     try {
       final result = await _customerService.getCustomers(
         page: _currentPage,
         perPage: _perPage,
-        search: _searchController.text.isEmpty ? null : _searchController.text,
+        search: _searchQuery,
+        isActive: _isActiveFilter,
         sortBy: _sortBy,
         sortAsc: _sortAsc,
       );
       
       setState(() {
         _customers = result['customers'] as List<Customer>;
-        _total = result['total'] as int;
+        _totalCustomers = result['total'] as int;
         _currentPage = result['page'] as int;
         _perPage = result['per_page'] as int;
         _totalPages = result['total_pages'] as int;
-        _isLoading = false;
+        _isLoadingCustomers = false;
       });
     } catch (e) {
       setState(() {
-        _isLoading = false;
+        _isLoadingCustomers = false;
       });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error loading customers: $e')),
-      );
+      _showSnackBar('Failed to load customers: ${e.toString()}');
     }
   }
   
-  void _resetForm() {
-    _nameController.clear();
-    _emailController.clear();
-    _phoneController.clear();
-    _addressController.clear();
-    _editingCustomerId = null;
-    _isEditing = false;
-    _formKey.currentState?.reset();
+  // Change page
+  void _changePage(int page) {
+    if (page != _currentPage) {
+      setState(() {
+        _currentPage = page;
+      });
+      _loadCustomers();
+    }
   }
   
-  Future<void> _saveCustomer() async {
-    if (_formKey.currentState?.validate() != true) {
-      return;
-    }
-    
+  // Apply filters
+  void _applyFilters() {
     setState(() {
-      _isLoading = true;
+      _currentPage = 1;
     });
+    _loadCustomers();
+  }
+  
+  // Reset filters
+  void _resetFilters() {
+    setState(() {
+      _searchQuery = null;
+      _isActiveFilter = null;
+      _currentPage = 1;
+    });
+    _loadCustomers();
+  }
+  
+  // Sort customers
+  void _sortCustomers(String column) {
+    setState(() {
+      if (_sortBy == column) {
+        _sortAsc = !_sortAsc;
+      } else {
+        _sortBy = column;
+        _sortAsc = true;
+      }
+    });
+    _loadCustomers();
+  }
+  
+  // Show a form dialog to add/edit a customer
+  Future<void> _showCustomerForm({Customer? customer}) async {
+    // Reset form values
+    _formName = customer?.name ?? '';
+    _formEmail = customer?.email ?? '';
+    _formPhone = customer?.phone ?? '';
+    _formAddress = customer?.address ?? '';
+    _formCity = customer?.city ?? '';
+    _formPostalCode = customer?.postalCode ?? '';
+    _formNotes = customer?.notes ?? '';
+    _formIsActive = customer?.isActive ?? true;
     
-    try {
+    final isEditing = customer != null;
+    
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(isEditing ? 'Edit Customer' : 'Add New Customer'),
+        content: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  initialValue: _formName,
+                  decoration: const InputDecoration(
+                    labelText: 'Full Name*',
+                    hintText: 'Enter customer\'s full name',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a name';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) => _formName = value,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  initialValue: _formEmail,
+                  decoration: const InputDecoration(
+                    labelText: 'Email Address*',
+                    hintText: 'Enter email address',
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an email';
+                    }
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) => _formEmail = value,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  initialValue: _formPhone,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone Number',
+                    hintText: 'Enter phone number',
+                  ),
+                  keyboardType: TextInputType.phone,
+                  onChanged: (value) => _formPhone = value,
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  initialValue: _formAddress,
+                  decoration: const InputDecoration(
+                    labelText: 'Address',
+                    hintText: 'Enter street address',
+                  ),
+                  onChanged: (value) => _formAddress = value,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: _formCity,
+                        decoration: const InputDecoration(
+                          labelText: 'City',
+                          hintText: 'Enter city',
+                        ),
+                        onChanged: (value) => _formCity = value,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: _formPostalCode,
+                        decoration: const InputDecoration(
+                          labelText: 'Postal Code',
+                          hintText: 'Enter postal code',
+                        ),
+                        keyboardType: TextInputType.number,
+                        onChanged: (value) => _formPostalCode = value,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  initialValue: _formNotes,
+                  decoration: const InputDecoration(
+                    labelText: 'Notes',
+                    hintText: 'Additional customer notes',
+                  ),
+                  maxLines: 3,
+                  onChanged: (value) => _formNotes = value,
+                ),
+                const SizedBox(height: 16),
+                SwitchListTile(
+                  title: const Text('Active Customer'),
+                  value: _formIsActive,
+                  onChanged: (value) {
+                    setState(() {
+                      _formIsActive = value;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              if (_formKey.currentState!.validate()) {
+                Navigator.of(context).pop(true);
+              }
+            },
+            child: Text(isEditing ? 'Update' : 'Add'),
+          ),
+        ],
+      ),
+    );
+    
+    if (result == true) {
       final customerData = {
-        'name': _nameController.text,
-        'email': _emailController.text,
-        'phone': _phoneController.text,
-        'address': _addressController.text,
+        'name': _formName,
+        'email': _formEmail,
+        'phone': _formPhone,
+        'address': _formAddress,
+        'city': _formCity,
+        'postal_code': _formPostalCode,
+        'is_active': _formIsActive,
+        'notes': _formNotes,
       };
       
-      if (_isEditing && _editingCustomerId != null) {
-        await _customerService.updateCustomer(_editingCustomerId!, customerData);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Customer updated successfully')),
-        );
-      } else {
-        await _customerService.createCustomer(customerData);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Customer created successfully')),
-        );
+      try {
+        if (isEditing) {
+          await _customerService.updateCustomer(customer!.id, customerData);
+          _showSnackBar('Customer updated successfully');
+        } else {
+          await _customerService.createCustomer(customerData);
+          _showSnackBar('Customer added successfully');
+        }
+        _loadCustomers();
+        _loadStatistics();
+      } catch (e) {
+        _showSnackBar('Failed to ${isEditing ? 'update' : 'add'} customer: ${e.toString()}');
       }
-      
-      _resetForm();
-      await _loadCustomers();
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error saving customer: $e')),
-      );
     }
   }
   
-  Future<void> _editCustomer(Customer customer) async {
-    setState(() {
-      _isEditing = true;
-      _editingCustomerId = customer.id;
-      _nameController.text = customer.name;
-      _emailController.text = customer.email;
-      _phoneController.text = customer.phone;
-      _addressController.text = customer.address ?? '';
-    });
-    
-    // Show the form dialog
-    await _showFormDialog();
-  }
-  
+  // Delete a customer
   Future<void> _deleteCustomer(Customer customer) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: Text('Are you sure you want to delete ${customer.name}?'),
+        title: const Text('Confirm Deletion'),
+        content: Text('Are you sure you want to delete ${customer.name}? This cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -169,369 +348,724 @@ class _CustomersScreenState extends State<CustomersScreen> {
       ),
     );
     
-    if (confirmed != true) {
-      return;
-    }
-    
-    setState(() {
-      _isLoading = true;
-    });
-    
-    try {
-      await _customerService.deleteCustomer(customer.id);
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Customer deleted successfully')),
-      );
-      
-      await _loadCustomers();
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error deleting customer: $e')),
-      );
+    if (confirmed == true) {
+      try {
+        await _customerService.deleteCustomer(customer.id);
+        _showSnackBar('Customer deleted successfully');
+        _loadCustomers();
+        _loadStatistics();
+      } catch (e) {
+        _showSnackBar('Failed to delete customer: ${e.toString()}');
+      }
     }
   }
   
-  Future<void> _showFormDialog() async {
-    return showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(_isEditing ? 'Edit Customer' : 'Add New Customer'),
-        content: SizedBox(
-          width: 400,
-          child: Form(
-            key: _formKey,
-            child: SingleChildScrollView(
+  // Toggle customer active status
+  Future<void> _toggleCustomerStatus(Customer customer) async {
+    try {
+      await _customerService.toggleCustomerStatus(customer.id, !customer.isActive);
+      _showSnackBar('Customer status updated successfully');
+      _loadCustomers();
+      _loadStatistics();
+    } catch (e) {
+      _showSnackBar('Failed to update customer status: ${e.toString()}');
+    }
+  }
+  
+  // Show a snackbar with a message
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Customer Management'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Overview'),
+            Tab(text: 'Customer List'),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildOverviewTab(),
+          _buildCustomerListTab(),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _showCustomerForm(),
+        child: const Icon(Icons.add),
+        tooltip: 'Add New Customer',
+      ),
+    );
+  }
+  
+  // Build the overview tab
+  Widget _buildOverviewTab() {
+    if (_isLoadingStats) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    
+    final currencyFormat = NumberFormat.currency(symbol: 'TND ', decimalDigits: 2);
+    
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Customer Statistics',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 16),
+          
+          // Statistics cards
+          GridView.count(
+            crossAxisCount: MediaQuery.of(context).size.width > 1200 ? 4 : 
+                           (MediaQuery.of(context).size.width > 800 ? 2 : 1),
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: [
+              StatCard(
+                title: 'Total Customers',
+                value: _statistics['total_customers']?.toString() ?? '0',
+                icon: Icons.people,
+                color: Colors.blue,
+              ),
+              StatCard(
+                title: 'Active Customers',
+                value: _statistics['active_customers']?.toString() ?? '0',
+                icon: Icons.person,
+                color: Colors.green,
+              ),
+              StatCard(
+                title: 'New This Month',
+                value: _statistics['new_last_month']?.toString() ?? '0',
+                icon: Icons.person_add,
+                color: Colors.orange,
+              ),
+              StatCard(
+                title: 'Total Revenue',
+                value: currencyFormat.format(_statistics['total_revenue'] ?? 0),
+                icon: Icons.attach_money,
+                color: Colors.purple,
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 24),
+          
+          // Top cities chart
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      hintText: 'Enter customer name',
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a name';
-                      }
-                      return null;
-                    },
+                  const Text(
+                    'Customers by City',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      hintText: 'Enter email address',
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter an email';
-                      }
-                      
-                      final emailRegex = RegExp(
-                        r'^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z]+',
-                      );
-                      
-                      if (!emailRegex.hasMatch(value)) {
-                        return 'Please enter a valid email';
-                      }
-                      
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _phoneController,
-                    decoration: const InputDecoration(
-                      labelText: 'Phone',
-                      hintText: 'Enter phone number',
-                    ),
-                    keyboardType: TextInputType.phone,
-                    inputFormatters: [
-                      FilteringTextInputFormatter.digitsOnly,
-                    ],
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a phone number';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _addressController,
-                    decoration: const InputDecoration(
-                      labelText: 'Address',
-                      hintText: 'Enter address (optional)',
-                    ),
-                    maxLines: 2,
+                  SizedBox(
+                    height: 300,
+                    child: _buildTopCitiesChart(),
                   ),
                 ],
               ),
             ),
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              _resetForm();
-              Navigator.of(context).pop();
-            },
-            child: const Text('Cancel'),
+          
+          const SizedBox(height: 24),
+          
+          // Customer growth chart
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Customer Growth',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    height: 300,
+                    child: _buildCustomerGrowthChart(),
+                  ),
+                ],
+              ),
+            ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState?.validate() == true) {
-                _saveCustomer();
-                Navigator.of(context).pop();
-              }
-            },
-            child: Text(_isEditing ? 'Update' : 'Save'),
+          
+          const SizedBox(height: 24),
+          
+          // Recent customers card
+          Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Recent Customers',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildRecentCustomersTable(),
+                ],
+              ),
+            ),
           ),
         ],
       ),
     );
   }
   
-  void _toggleSort(String column) {
-    setState(() {
-      if (_sortBy == column) {
-        _sortAsc = !_sortAsc;
-      } else {
-        _sortBy = column;
-        _sortAsc = true;
-      }
-    });
-    
-    _loadCustomers();
-  }
-  
-  @override
-  Widget build(BuildContext context) {
-    final isDesktop = ResponsiveBreakpoints.of(context).largerThan(MOBILE);
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Customer Management'),
-        centerTitle: true,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadCustomers,
-            tooltip: 'Refresh',
-          ),
-        ],
-      ),
-      body: _isLoading
-          ? const Center(child: LoadingIndicator())
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
+  // Build the customer list tab
+  Widget _buildCustomerListTab() {
+    return Column(
+      children: [
+        // Filters section
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Filters',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
                     children: [
                       Expanded(
                         child: TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: 'Search customers...',
-                            prefixIcon: const Icon(Icons.search),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            suffixIcon: _searchController.text.isNotEmpty
-                                ? IconButton(
-                                    icon: const Icon(Icons.clear),
-                                    onPressed: () {
-                                      _searchController.clear();
-                                      _loadCustomers();
-                                    },
-                                  )
-                                : null,
+                          decoration: const InputDecoration(
+                            labelText: 'Search',
+                            hintText: 'Customer name, email, phone...',
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(),
                           ),
-                          onSubmitted: (_) => _loadCustomers(),
+                          onChanged: (value) {
+                            setState(() {
+                              _searchQuery = value.isNotEmpty ? value : null;
+                            });
+                          },
                         ),
                       ),
                       const SizedBox(width: 16),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          _resetForm();
-                          await _showFormDialog();
-                        },
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add Customer'),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16,
+                      DropdownButton<bool?>(
+                        hint: const Text('Status'),
+                        value: _isActiveFilter,
+                        items: const [
+                          DropdownMenuItem<bool?>(
+                            value: null,
+                            child: Text('All Statuses'),
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: _customers.isEmpty
-                      ? const Center(
-                          child: Text('No customers found'),
-                        )
-                      : Scrollbar(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: SingleChildScrollView(
-                              child: DataTable(
-                                headingRowColor: MaterialStateProperty.all(
-                                  Colors.grey.shade100,
-                                ),
-                                columns: [
-                                  DataColumn(
-                                    label: const Text('ID'),
-                                    onSort: (_, __) => _toggleSort('id'),
-                                  ),
-                                  DataColumn(
-                                    label: Row(
-                                      children: [
-                                        const Text('Name'),
-                                        if (_sortBy == 'name')
-                                          Icon(
-                                            _sortAsc
-                                                ? Icons.arrow_upward
-                                                : Icons.arrow_downward,
-                                            size: 16,
-                                          ),
-                                      ],
-                                    ),
-                                    onSort: (_, __) => _toggleSort('name'),
-                                  ),
-                                  DataColumn(
-                                    label: Row(
-                                      children: [
-                                        const Text('Email'),
-                                        if (_sortBy == 'email')
-                                          Icon(
-                                            _sortAsc
-                                                ? Icons.arrow_upward
-                                                : Icons.arrow_downward,
-                                            size: 16,
-                                          ),
-                                      ],
-                                    ),
-                                    onSort: (_, __) => _toggleSort('email'),
-                                  ),
-                                  DataColumn(
-                                    label: Row(
-                                      children: [
-                                        const Text('Phone'),
-                                        if (_sortBy == 'phone')
-                                          Icon(
-                                            _sortAsc
-                                                ? Icons.arrow_upward
-                                                : Icons.arrow_downward,
-                                            size: 16,
-                                          ),
-                                      ],
-                                    ),
-                                    onSort: (_, __) => _toggleSort('phone'),
-                                  ),
-                                  const DataColumn(
-                                    label: Text('Address'),
-                                  ),
-                                  const DataColumn(
-                                    label: Text('Actions'),
-                                  ),
-                                ],
-                                rows: _customers.map((customer) {
-                                  return DataRow(
-                                    cells: [
-                                      DataCell(Text('#${customer.id}')),
-                                      DataCell(Text(customer.name)),
-                                      DataCell(Text(customer.email)),
-                                      DataCell(Text(customer.phone)),
-                                      DataCell(
-                                        Text(customer.address ?? 'N/A'),
-                                      ),
-                                      DataCell(
-                                        Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            IconButton(
-                                              icon: const Icon(Icons.edit, color: Colors.blue),
-                                              onPressed: () => _editCustomer(customer),
-                                              tooltip: 'Edit',
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(Icons.delete, color: Colors.red),
-                                              onPressed: () => _deleteCustomer(customer),
-                                              tooltip: 'Delete',
-                                            ),
-                                            IconButton(
-                                              icon: const Icon(Icons.directions_car, color: Colors.green),
-                                              onPressed: () {
-                                                // Navigate to vehicles screen filtered by customer
-                                                // TODO: Implement this when vehicles screen is created
-                                              },
-                                              tooltip: 'View Vehicles',
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                }).toList(),
-                              ),
-                            ),
+                          DropdownMenuItem<bool?>(
+                            value: true,
+                            child: Text('Active'),
                           ),
-                        ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Showing ${_customers.length} of $_total customers'),
-                      Row(
-                        children: [
-                          IconButton(
-                            onPressed: _currentPage > 1
-                                ? () {
-                                    setState(() {
-                                      _currentPage--;
-                                    });
-                                    _loadCustomers();
-                                  }
-                                : null,
-                            icon: const Icon(Icons.chevron_left),
-                            tooltip: 'Previous page',
-                          ),
-                          Text('Page $_currentPage of $_totalPages'),
-                          IconButton(
-                            onPressed: _currentPage < _totalPages
-                                ? () {
-                                    setState(() {
-                                      _currentPage++;
-                                    });
-                                    _loadCustomers();
-                                  }
-                                : null,
-                            icon: const Icon(Icons.chevron_right),
-                            tooltip: 'Next page',
+                          DropdownMenuItem<bool?>(
+                            value: false,
+                            child: Text('Inactive'),
                           ),
                         ],
+                        onChanged: (value) {
+                          setState(() {
+                            _isActiveFilter = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(width: 16),
+                      ElevatedButton(
+                        onPressed: _applyFilters,
+                        child: const Text('Apply Filters'),
+                      ),
+                      const SizedBox(width: 8),
+                      TextButton(
+                        onPressed: _resetFilters,
+                        child: const Text('Reset'),
                       ),
                     ],
                   ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        
+        // Customer data table
+        Expanded(
+          child: _isLoadingCustomers
+              ? const Center(child: CircularProgressIndicator())
+              : _buildCustomersDataTable(),
+        ),
+        
+        // Pagination controls
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.first_page),
+                onPressed: _currentPage > 1 ? () => _changePage(1) : null,
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_left),
+                onPressed: _currentPage > 1 ? () => _changePage(_currentPage - 1) : null,
+              ),
+              const SizedBox(width: 8),
+              Text('Page $_currentPage of $_totalPages'),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.chevron_right),
+                onPressed: _currentPage < _totalPages ? () => _changePage(_currentPage + 1) : null,
+              ),
+              IconButton(
+                icon: const Icon(Icons.last_page),
+                onPressed: _currentPage < _totalPages ? () => _changePage(_totalPages) : null,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+  
+  // Build the top cities chart
+  Widget _buildTopCitiesChart() {
+    final topCities = _statistics['top_cities'] as Map<String, dynamic>? ?? {};
+    
+    if (topCities.isEmpty) {
+      return const Center(child: Text('No data available'));
+    }
+    
+    final entries = topCities.entries.toList()
+      ..sort((a, b) => (b.value as int).compareTo(a.value as int));
+    
+    final barGroups = <BarChartGroupData>[];
+    final titles = <String>[];
+    
+    for (int i = 0; i < entries.length && i < 5; i++) {
+      final entry = entries[i];
+      titles.add(entry.key);
+      barGroups.add(
+        BarChartGroupData(
+          x: i,
+          barRods: [
+            BarChartRodData(
+              toY: (entry.value as int).toDouble(),
+              color: Colors.blue,
+              width: 20,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(6),
+                topRight: Radius.circular(6),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    return BarChart(
+      BarChartData(
+        alignment: BarChartAlignment.spaceAround,
+        maxY: (entries.isNotEmpty ? (entries.first.value as int).toDouble() * 1.2 : 10),
+        titlesData: FlTitlesData(
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                if (value.toInt() < 0 || value.toInt() >= titles.length) {
+                  return const SizedBox.shrink();
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    titles[value.toInt()],
+                    style: const TextStyle(fontSize: 12),
+                  ),
+                );
+              },
+              reservedSize: 30,
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 40,
+              getTitlesWidget: (value, meta) {
+                return Text(
+                  value.toInt().toString(),
+                  style: const TextStyle(fontSize: 10),
+                );
+              },
+            ),
+          ),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+        ),
+        borderData: FlBorderData(show: false),
+        barGroups: barGroups,
+        gridData: FlGridData(show: true),
+      ),
+    );
+  }
+  
+  // Build the customer growth chart
+  Widget _buildCustomerGrowthChart() {
+    final customerGrowth = _statistics['customer_growth'] as Map<String, dynamic>? ?? {};
+    
+    if (customerGrowth.isEmpty) {
+      return const Center(child: Text('No data available'));
+    }
+    
+    final spots = <FlSpot>[];
+    final months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+    ];
+    
+    for (int i = 0; i < months.length; i++) {
+      final month = months[i];
+      final count = customerGrowth[month] as int? ?? 0;
+      spots.add(FlSpot(i.toDouble(), count.toDouble()));
+    }
+    
+    return LineChart(
+      LineChartData(
+        gridData: FlGridData(show: true),
+        titlesData: FlTitlesData(
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              getTitlesWidget: (value, meta) {
+                if (value.toInt() < 0 || value.toInt() >= months.length) {
+                  return const SizedBox.shrink();
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(months[value.toInt()]),
+                );
+              },
+              reservedSize: 30,
+            ),
+          ),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 40,
+              getTitlesWidget: (value, meta) {
+                return Text(
+                  value.toInt().toString(),
+                  style: const TextStyle(fontSize: 10),
+                );
+              },
+            ),
+          ),
+          topTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+        ),
+        borderData: FlBorderData(show: true),
+        lineBarsData: [
+          LineChartBarData(
+            spots: spots,
+            isCurved: true,
+            barWidth: 3,
+            color: Colors.green,
+            dotData: FlDotData(show: true),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  // Build the vehicles per customer chart
+  Widget _buildVehiclesPerCustomerChart() {
+    final vehiclesPerCustomer = _statistics['vehicles_per_customer'] as Map<String, dynamic>? ?? {};
+    
+    if (vehiclesPerCustomer.isEmpty) {
+      return const Center(child: Text('No data available'));
+    }
+    
+    final pieChartSections = <PieChartSectionData>[];
+    final colors = [Colors.blue, Colors.green, Colors.orange];
+    
+    int i = 0;
+    vehiclesPerCustomer.forEach((key, value) {
+      final count = value as int;
+      if (count > 0) {
+        pieChartSections.add(
+          PieChartSectionData(
+            color: colors[i % colors.length],
+            value: count.toDouble(),
+            title: '$key\n$count',
+            radius: 120,
+            titleStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        );
+      }
+      i++;
+    });
+    
+    return pieChartSections.isEmpty
+        ? const Center(child: Text('No data available'))
+        : PieChart(
+            PieChartData(
+              sections: pieChartSections,
+              centerSpaceRadius: 40,
+              sectionsSpace: 2,
+            ),
+          );
+  }
+  
+  // Build the recent customers table
+  Widget _buildRecentCustomersTable() {
+    final recentCustomers = _statistics['recent_customers'] as List<dynamic>? ?? [];
+    
+    if (recentCustomers.isEmpty) {
+      return const Center(child: Text('No recent customers'));
+    }
+    
+    return DataTable(
+      columns: const [
+        DataColumn(label: Text('Name')),
+        DataColumn(label: Text('Email')),
+        DataColumn(label: Text('Joined')),
+        DataColumn(label: Text('Vehicles')),
+        DataColumn(label: Text('Status')),
+      ],
+      rows: recentCustomers.map<DataRow>((customer) {
+        final isActive = customer['is_active'] as bool;
+        return DataRow(
+          cells: [
+            DataCell(Text(customer['name'] as String)),
+            DataCell(Text(customer['email'] as String)),
+            DataCell(Text(DateFormat('MMM d, yyyy').format(
+              DateTime.parse(customer['created_at'] as String),
+            ))),
+            DataCell(Text((customer['vehicle_count'] as int).toString())),
+            DataCell(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Customer.getStatusColor(isActive).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  Customer.getStatusText(isActive),
+                  style: TextStyle(
+                    color: Customer.getStatusColor(isActive),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      }).toList(),
+    );
+  }
+  
+  // Build the customers data table
+  Widget _buildCustomersDataTable() {
+    if (_customers.isEmpty) {
+      return const Center(
+        child: Text('No customers found matching your criteria'),
+      );
+    }
+    
+    return DataTable2(
+      columnSpacing: 12,
+      horizontalMargin: 12,
+      minWidth: 900,
+      sortColumnIndex: _sortBy == 'name' ? 0 : 
+                      _sortBy == 'email' ? 1 :
+                      _sortBy == 'created_at' ? 5 :
+                      _sortBy == 'vehicle_count' ? 6 : null,
+      sortAscending: _sortAsc,
+      columns: [
+        DataColumn2(
+          label: const Text('Name'),
+          onSort: (_, __) => _sortCustomers('name'),
+          size: ColumnSize.L,
+        ),
+        DataColumn2(
+          label: const Text('Email'),
+          onSort: (_, __) => _sortCustomers('email'),
+          size: ColumnSize.L,
+        ),
+        DataColumn2(
+          label: const Text('Phone'),
+          size: ColumnSize.M,
+        ),
+        DataColumn2(
+          label: const Text('City'),
+          size: ColumnSize.M,
+        ),
+        DataColumn2(
+          label: const Text('Status'),
+          size: ColumnSize.S,
+        ),
+        DataColumn2(
+          label: const Text('Joined'),
+          onSort: (_, __) => _sortCustomers('created_at'),
+          size: ColumnSize.M,
+        ),
+        DataColumn2(
+          label: const Text('Vehicles'),
+          onSort: (_, __) => _sortCustomers('vehicle_count'),
+          numeric: true,
+          size: ColumnSize.S,
+        ),
+        DataColumn2(
+          label: const Text('Total Spent'),
+          size: ColumnSize.M,
+        ),
+        const DataColumn2(
+          label: Text('Actions'),
+          size: ColumnSize.M,
+        ),
+      ],
+      rows: _customers.map((customer) {
+        return DataRow2(
+          cells: [
+            DataCell(
+              Row(
+                children: [
+                  customer.getAvatar(radius: 16),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(customer.name)),
+                ],
+              ),
+            ),
+            DataCell(Text(customer.email)),
+            DataCell(Text(customer.phone ?? 'N/A')),
+            DataCell(Text(customer.city ?? 'N/A')),
+            DataCell(
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Customer.getStatusColor(customer.isActive).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  Customer.getStatusText(customer.isActive),
+                  style: TextStyle(
+                    color: Customer.getStatusColor(customer.isActive),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            DataCell(Text(customer.formattedCreatedAt())),
+            DataCell(Text(customer.vehicleCount.toString())),
+            DataCell(Text(customer.formattedTotalSpent())),
+            DataCell(Row(
+              children: [
+                // Edit button
+                IconButton(
+                  icon: const Icon(Icons.edit, size: 20),
+                  tooltip: 'Edit Customer',
+                  onPressed: () => _showCustomerForm(customer: customer),
+                ),
+                // Toggle status button
+                IconButton(
+                  icon: Icon(
+                    customer.isActive ? Icons.person_off : Icons.person,
+                    size: 20,
+                    color: customer.isActive ? Colors.red : Colors.green,
+                  ),
+                  tooltip: customer.isActive ? 'Mark as Inactive' : 'Mark as Active',
+                  onPressed: () => _toggleCustomerStatus(customer),
+                ),
+                // More options button
+                PopupMenuButton<String>(
+                  tooltip: 'More Actions',
+                  icon: const Icon(Icons.more_vert, size: 20),
+                  onSelected: (String action) {
+                    switch (action) {
+                      case 'vehicles':
+                        // Navigate to vehicles filtered by this customer
+                        _showSnackBar('View vehicles would be implemented here');
+                        break;
+                      case 'repairs':
+                        // Navigate to repairs filtered by this customer
+                        _showSnackBar('View repairs would be implemented here');
+                        break;
+                      case 'invoices':
+                        // Navigate to invoices filtered by this customer
+                        _showSnackBar('View invoices would be implemented here');
+                        break;
+                      case 'delete':
+                        _deleteCustomer(customer);
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem<String>(
+                      value: 'vehicles',
+                      child: ListTile(
+                        leading: Icon(Icons.directions_car),
+                        title: Text('View Vehicles'),
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'repairs',
+                      child: ListTile(
+                        leading: Icon(Icons.build),
+                        title: Text('View Repairs'),
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'invoices',
+                      child: ListTile(
+                        leading: Icon(Icons.receipt),
+                        title: Text('View Invoices'),
+                      ),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'delete',
+                      child: ListTile(
+                        leading: Icon(Icons.delete, color: Colors.red),
+                        title: Text('Delete Customer'),
+                      ),
+                    ),
+                  ],
                 ),
               ],
-            ),
+            )),
+          ],
+        );
+      }).toList(),
     );
   }
 } 
