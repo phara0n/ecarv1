@@ -34,8 +34,8 @@ This document outlines the development timeline and milestones for the eCar Gara
 - [x] Develop invoice viewing and mileage update features
 
 ### Week 10-12
-- [ ] Set up Flutter web project for admin interface
-- [ ] Create customer management dashboard
+- [x] Set up Flutter web project for admin interface
+- [x] Create customer management dashboard
 - [ ] Implement repair management interface
 - [ ] Develop invoice management system
 - [ ] Create reporting and analytics dashboard
@@ -44,7 +44,7 @@ This document outlines the development timeline and milestones for the eCar Gara
 
 ### Week 13-14
 - [x] Integrate frontend and backend systems
-- [ ] Implement push notifications
+- [x] Implement push notifications
 - [ ] Set up localization for multiple languages
 - [ ] Conduct unit and integration testing
 - [ ] Perform security testing and audits
