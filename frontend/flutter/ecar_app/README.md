@@ -2,6 +2,9 @@
 
 A Flutter-based mobile application for customers of eCar Garage in Tunisia. This application allows customers to manage their vehicles, view service history, access invoices, and track repair status.
 
+## Repository
+- **GitHub:** [https://github.com/phara0n/ecarv1](https://github.com/phara0n/ecarv1)
+
 ## Features
 
 - User authentication using secure JWT tokens
@@ -30,8 +33,8 @@ A Flutter-based mobile application for customers of eCar Garage in Tunisia. This
 
 ### Installation
 
-1. Clone the repository
-2. Navigate to the project directory
+1. Clone the repository: `git clone https://github.com/phara0n/ecarv1.git`
+2. Navigate to the project directory: `cd ecarv1/frontend/flutter/ecar_app`
 3. Run `flutter pub get` to install dependencies
 4. Update the API base URL in `lib/services/auth_service.dart` to point to your API instance
 5. Run the app using `flutter run`

@@ -2,6 +2,9 @@
 
 A Flutter web application for garage administrators to manage customers, vehicles, repairs, and invoices for the eCar Garage in Tunisia.
 
+## Repository
+- **GitHub:** [https://github.com/phara0n/ecarv1](https://github.com/phara0n/ecarv1)
+
 ## Features
 
 - Admin authentication and authorization
@@ -30,8 +33,8 @@ A Flutter web application for garage administrators to manage customers, vehicle
 
 ### Installation
 
-1. Clone the repository
-2. Navigate to the project directory
+1. Clone the repository: `git clone https://github.com/phara0n/ecarv1.git`
+2. Navigate to the project directory: `cd ecarv1/frontend/web`
 3. Run `flutter pub get` to install dependencies
 4. Update the API base URL in configuration files
 5. Run the app using `flutter run -d chrome`
