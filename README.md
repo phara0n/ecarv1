@@ -51,17 +51,21 @@ This application is designed for a garage in Tunisia to manage customer vehicle 
 - [x] Design app theme based on brand specifications
 - [x] Create basic screens for the mobile app
 - [x] Initialize Git repository and push to GitHub
+- [x] Complete customer mobile app screens:
+  - [x] Vehicle management features (list and details)
+  - [x] Vehicle mileage update functionality
+  - [x] Repair history viewing
+  - [x] Invoice viewing and download functionality
+  - [x] User profile and settings
 
 ## Next Steps
-- [ ] Complete customer mobile app screens
-- [ ] Implement vehicle management features
-- [ ] Add repair history viewing
-- [ ] Create invoice download functionality
-- [ ] Implement mileage update feature
-- [ ] Add multilingual support
+- [ ] Add multilingual support (English, French, Arabic)
+- [ ] Add notifications system for repair status updates
+- [ ] Implement offline support for basic functionality
 - [ ] Develop admin web interface
 - [ ] Create deployment scripts
 - [ ] Set up CI/CD pipeline
+- [ ] Implement automated testing
 - [ ] Prepare for App Store and Google Play submission
 
 ## Getting Started
