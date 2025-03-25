@@ -99,7 +99,15 @@ class ECarApp extends StatelessWidget {
         Locale('ar'), // Arabic
       ],
       
-      // Start with the splash screen
+      // Define named routes
+      initialRoute: '/',
+      routes: {
+        '/': (context) => const SplashScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/home': (context) => const HomeScreen(),
+      },
+      
+      // Start the app
       home: FutureBuilder<bool>(
         future: AuthService().isLoggedIn(),
         builder: (context, snapshot) {
@@ -108,8 +116,7 @@ class ECarApp extends StatelessWidget {
           } else {
             final bool isLoggedIn = snapshot.data ?? false;
             if (isLoggedIn) {
-              // Navigate to home screen
-              return const HomeScreen(); // Changed from SplashScreen to HomeScreen
+              return const HomeScreen();
             } else {
               return const LoginScreen();
             }

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/vehicle.dart';
 import '../models/repair.dart';
 import '../services/vehicle_service.dart';
+import '../services/repair_service.dart';
 import 'update_mileage_screen.dart';
+import 'repair_detail_screen.dart';
 
 class VehicleDetailScreen extends StatefulWidget {
   final int vehicleId;
@@ -15,6 +17,7 @@ class VehicleDetailScreen extends StatefulWidget {
 
 class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
   final VehicleService _vehicleService = VehicleService();
+  final RepairService _repairService = RepairService();
   Vehicle? _vehicle;
   List<Repair>? _repairs;
   bool _isLoading = true;
@@ -35,9 +38,15 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
       
       final vehicle = await _vehicleService.getVehicle(widget.vehicleId);
       
-      // In a real app, we would fetch repairs from a repair service
-      // For now, we'll use mock data
-      final repairs = <Repair>[];
+      // Fetch repairs for this vehicle
+      List<Repair> repairs = [];
+      try {
+        repairs = await _repairService.getRepairsForVehicle(widget.vehicleId);
+      } catch (e) {
+        // If we can't load repairs, we'll just show an empty list
+        // but we don't want to fail the whole screen
+        print('Failed to load repairs: $e');
+      }
       
       setState(() {
         _vehicle = vehicle;
@@ -210,11 +219,16 @@ class _VehicleDetailScreenState extends State<VehicleDetailScreen> {
               return Card(
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
-                  title: Text('${repair.description}'),
+                  title: Text(repair.description),
                   subtitle: Text('${_formatDate(repair.date)} - ${repair.status}'),
                   trailing: Text('${repair.cost} TND'),
                   onTap: () {
-                    // Navigate to repair details
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RepairDetailScreen(repairId: repair.id),
+                      ),
+                    );
                   },
                 ),
               );

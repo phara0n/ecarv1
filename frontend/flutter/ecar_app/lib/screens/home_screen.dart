@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../models/customer.dart';
 import '../services/auth_service.dart';
 import 'vehicle_list_screen.dart';
+import 'repairs_screen.dart';
+import 'invoices_screen.dart';
+import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -44,13 +47,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final List<Widget> tabs = [
       const VehicleListScreen(),
-      const Center(child: Text('Repairs')),
-      const Center(child: Text('Invoices')),
-      const Center(child: Text('Profile')),
+      const RepairsScreen(),
+      const InvoicesScreen(),
+      const ProfileScreen(),
     ];
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: _selectedIndex == 1 || _selectedIndex == 2 || _selectedIndex == 3 ? null : AppBar(
         title: Text(_isLoading ? 'Loading...' : 'Welcome, ${_customer?.name ?? 'User'}'),
       ),
       body: _isLoading
