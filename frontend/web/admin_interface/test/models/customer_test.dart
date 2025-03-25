@@ -16,6 +16,7 @@ void main() {
         'city': 'Tunis',
         'is_active': true,
         'vehicle_count': 3,
+        'repair_count': 5,
         'total_spent': 2500.50,
         'created_at': '2023-03-15T00:00:00.000Z',
         'updated_at': '2023-03-15T00:00:00.000Z',
@@ -31,6 +32,7 @@ void main() {
       expect(customer.city, 'Tunis');
       expect(customer.isActive, true);
       expect(customer.vehicleCount, 3);
+      expect(customer.repairCount, 5);
       expect(customer.totalSpent, 2500.50);
       expect(customer.createdAt.year, dateTime.year);
       expect(customer.createdAt.month, dateTime.month);
@@ -52,6 +54,9 @@ void main() {
         name: 'John Doe',
         email: 'john.doe@example.com',
         isActive: true,
+        vehicleCount: 2,
+        repairCount: 3,
+        totalSpent: 1500.0,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -61,6 +66,9 @@ void main() {
         name: 'Jane Smith',
         email: 'jane.smith@example.com',
         isActive: false,
+        vehicleCount: 1,
+        repairCount: 0,
+        totalSpent: 500.0,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -80,12 +88,15 @@ void main() {
         name: 'John Doe',
         email: 'john.doe@example.com',
         totalSpent: 2500.50,
+        vehicleCount: 2,
+        repairCount: 4,
+        isActive: true,
         createdAt: DateTime(2023, 3, 15),
         updatedAt: DateTime(2023, 3, 15),
       );
       
       expect(customer.formattedCreatedAt(), 'Mar 15, 2023');
-      expect(customer.formattedTotalSpent(), 'TD 2,500.50');
+      expect(customer.formattedTotalSpent(), 'TND 2,500.50');
     });
     
     test('Customer avatar generator', () {
@@ -93,6 +104,10 @@ void main() {
         id: 1,
         name: 'John Doe',
         email: 'john.doe@example.com',
+        vehicleCount: 0,
+        repairCount: 0,
+        totalSpent: 0.0,
+        isActive: true,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -101,6 +116,10 @@ void main() {
         id: 2,
         name: 'Jane Smith',
         email: 'jane.smith@example.com',
+        vehicleCount: 0,
+        repairCount: 0,
+        totalSpent: 0.0,
+        isActive: true,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -109,6 +128,10 @@ void main() {
         id: 3,
         name: '',
         email: 'anonymous@example.com',
+        vehicleCount: 0,
+        repairCount: 0,
+        totalSpent: 0.0,
+        isActive: true,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
@@ -116,7 +139,7 @@ void main() {
       // Test initials generation
       expect(customer1.getInitials(), 'JD');
       expect(customer2.getInitials(), 'JS');
-      expect(customer3.getInitials(), 'A');
+      expect(customer3.getInitials(), '?');
     });
   });
 } 

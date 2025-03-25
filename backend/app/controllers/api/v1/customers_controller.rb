@@ -1,7 +1,6 @@
 module Api
   module V1
     class CustomersController < BaseController
-      skip_before_action :authenticate_request, only: [:create]
       before_action :set_customer, only: [:show, :update, :destroy]
       
       # GET /api/v1/customers
