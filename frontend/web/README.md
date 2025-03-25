@@ -11,7 +11,17 @@ A Flutter web application for garage administrators to manage customers, vehicle
 - Customer management (add, edit, remove)
 - Vehicle management with detailed service history
 - Repair tracking and management
+  - Status tracking (pending, in progress, completed, cancelled)
+  - Technician assignment
+  - Parts and labor tracking
+  - Service history for vehicles
+  - Statistics and reporting
 - Invoice generation and management
+  - Create invoices for repairs
+  - Track payment status (paid, pending, overdue)
+  - Generate PDF invoices
+  - Send invoices via email
+  - Payment tracking and reporting
 - Reporting and analytics dashboard
 - Multilingual support (English, French, Arabic)
 
@@ -50,8 +60,17 @@ The web admin interface can be deployed to:
 ## Project Structure
 
 - `lib/models/` - Data models for the application
+  - `repair.dart` - Model for repair management
+  - `invoice.dart` - Model for invoice management
+  - Other business models
 - `lib/screens/` - UI screens for the admin interface
+  - `dashboard_screen.dart` - Main dashboard with statistics
+  - `repairs_screen.dart` - Complete repair management interface
+  - `invoices_screen.dart` - Invoice management interface
 - `lib/services/` - API communication and business logic
+  - `auth_service.dart` - Handles authentication
+  - `repair_service.dart` - Manages repair API requests
+  - `invoice_service.dart` - Manages invoice API requests
 - `lib/widgets/` - Reusable UI components
 - `assets/` - Images, icons, and fonts
 

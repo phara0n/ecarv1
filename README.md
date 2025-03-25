@@ -6,6 +6,7 @@ A complete garage management system with a Rails API backend and Flutter fronten
 
 - `/backend`: Ruby on Rails API
 - `/frontend/flutter/ecar_app`: Flutter mobile application
+- `/frontend/web/admin_interface`: Flutter web admin interface
 
 ## Backend (Rails API)
 
@@ -15,6 +16,7 @@ The backend is a Ruby on Rails API that provides endpoints for managing:
 - Vehicles
 - Repairs
 - Invoices and payments
+- Push notifications
 
 ### Authentication
 
@@ -29,7 +31,7 @@ cd backend
 RAILS_ENV=test rails test
 ```
 
-## Frontend (Flutter)
+## Frontend (Flutter Mobile App)
 
 The Flutter app provides a mobile interface for:
 
@@ -38,6 +40,7 @@ The Flutter app provides a mobile interface for:
 - Vehicle management
 - Repair tracking
 - Invoice viewing and payment
+- Push notification preferences
 
 ### Testing
 
@@ -47,6 +50,41 @@ Run the Flutter tests with:
 cd frontend/flutter/ecar_app
 flutter test
 ```
+
+## Admin Web Interface
+
+The web-based admin interface allows garage administrators to:
+
+- Manage customers and their vehicles
+- Track and update repair status
+- Create and manage invoices
+- View statistics and reports
+- Send push notifications to customers
+
+### Features
+
+- Responsive design for desktop and mobile
+- Dashboard with key business metrics
+- Complete repair management system
+- Invoice generation and management
+- Customer management
+
+### Running the Web Interface
+
+```bash
+cd frontend/web/admin_interface
+flutter pub get
+flutter run -d chrome
+```
+
+## Push Notifications
+
+The application implements push notifications using Firebase Cloud Messaging (FCM) to:
+
+- Alert customers about repair status changes
+- Send reminders for scheduled maintenance
+- Notify about invoice generation and payment due dates
+- Deliver promotional offers
 
 ## Development Setup
 
@@ -68,7 +106,7 @@ rails db:create db:migrate db:seed
 rails s
 ```
 
-### Frontend
+### Mobile App
 
 1. Install Flutter SDK
 2. Install dependencies:
@@ -82,6 +120,22 @@ flutter pub get
 
 ```bash
 flutter run
+```
+
+### Web Admin Interface
+
+1. Install Flutter SDK with web support
+2. Install dependencies:
+
+```bash
+cd frontend/web/admin_interface
+flutter pub get
+```
+
+3. Run the web app:
+
+```bash
+flutter run -d chrome
 ```
 
 ## API Documentation
