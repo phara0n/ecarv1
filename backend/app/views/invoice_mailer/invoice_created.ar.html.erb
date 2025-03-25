@@ -1,0 +1,41 @@
+<div dir="rtl" style="text-align: right; font-family: Arial, sans-serif;">
+  <h2>فاتورة جديدة من ورشة سيارات eCar</h2>
+  
+  <p>مرحباً <%= @customer.full_name %>،</p>
+  
+  <p>تم إصدار فاتورة جديدة لإصلاح سيارتك <%= @vehicle.brand %> <%= @vehicle.model %>.</p>
+  
+  <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+    <h3>تفاصيل الفاتورة:</h3>
+    <p><strong>رقم الفاتورة:</strong> <%= @invoice.invoice_number %></p>
+    <p><strong>تاريخ الإصدار:</strong> <%= @invoice.issue_date %></p>
+    <p><strong>المبلغ (بدون ضريبة):</strong> <%= sprintf("%.3f", @invoice.amount) %> د.ت</p>
+    <p><strong>ضريبة القيمة المضافة (19%):</strong> <%= sprintf("%.3f", @invoice.tax_amount) %> د.ت</p>
+    <p><strong>المبلغ الإجمالي:</strong> <%= sprintf("%.3f", @invoice.total_amount) %> د.ت</p>
+    <p><strong>حالة الدفع:</strong> <%= t("enums.invoice.payment_status.#{@invoice.payment_status}") %></p>
+    
+    <h3>تفاصيل الإصلاح:</h3>
+    <p><%= @repair.description %></p>
+  </div>
+  
+  <p>يمكنك العثور على نسخة PDF من الفاتورة مرفقة بهذا البريد الإلكتروني.</p>
+  
+  <p>يرجى دفع الفاتورة في أقرب وقت ممكن. يمكنك الدفع عن طريق:</p>
+  <ul>
+    <li>نقداً في ورشة السيارات</li>
+    <li>بطاقة ائتمان عبر تطبيق eCar للهاتف المحمول</li>
+    <li>تحويل بنكي إلى حسابنا: TN59 1234 5678 9012 3456 7890</li>
+  </ul>
+  
+  <p>إذا كانت لديك أي أسئلة، يرجى عدم التردد في الاتصال بنا على الرقم 71 234 567 أو عن طريق الرد على هذا البريد الإلكتروني.</p>
+  
+  <p>شكراً لاختيارك ورشة سيارات eCar!</p>
+  
+  <div style="margin-top: 40px; color: #777; font-size: 12px;">
+    <p>ورشة سيارات eCar</p>
+    <p>شارع الحبيب بورقيبة، تونس</p>
+    <p>الهاتف: 71 234 567</p>
+    <p>البريد الإلكتروني: info@ecar.tn</p>
+    <p>الموقع الإلكتروني: www.ecar.tn</p>
+  </div>
+</div> 

@@ -1,0 +1,41 @@
+<div style="font-family: Arial, sans-serif;">
+  <h2>Nouvelle Facture du Garage eCar</h2>
+  
+  <p>Bonjour <%= @customer.full_name %>,</p>
+  
+  <p>Une nouvelle facture a été émise pour la réparation de votre véhicule <%= @vehicle.brand %> <%= @vehicle.model %>.</p>
+  
+  <div style="border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+    <h3>Détails de la facture:</h3>
+    <p><strong>Numéro de facture:</strong> <%= @invoice.invoice_number %></p>
+    <p><strong>Date d'émission:</strong> <%= @invoice.issue_date %></p>
+    <p><strong>Montant HT:</strong> <%= sprintf("%.3f", @invoice.amount) %> TND</p>
+    <p><strong>TVA (19%):</strong> <%= sprintf("%.3f", @invoice.tax_amount) %> TND</p>
+    <p><strong>Montant TTC:</strong> <%= sprintf("%.3f", @invoice.total_amount) %> TND</p>
+    <p><strong>Statut de paiement:</strong> <%= t("enums.invoice.payment_status.#{@invoice.payment_status}") %></p>
+    
+    <h3>Détails de la réparation:</h3>
+    <p><%= @repair.description %></p>
+  </div>
+  
+  <p>Vous trouverez une copie PDF de la facture en pièce jointe à cet email.</p>
+  
+  <p>Merci de régler cette facture dans les meilleurs délais. Vous pouvez payer par:</p>
+  <ul>
+    <li>Espèces au garage</li>
+    <li>Carte de crédit via l'application mobile eCar</li>
+    <li>Virement bancaire sur notre compte: TN59 1234 5678 9012 3456 7890</li>
+  </ul>
+  
+  <p>Si vous avez des questions, n'hésitez pas à nous contacter au 71 234 567 ou en répondant à cet email.</p>
+  
+  <p>Merci d'avoir choisi le Garage eCar!</p>
+  
+  <div style="margin-top: 40px; color: #777; font-size: 12px;">
+    <p>Garage eCar</p>
+    <p>Avenue Habib Bourguiba, Tunis</p>
+    <p>Téléphone: 71 234 567</p>
+    <p>Email: info@ecar.tn</p>
+    <p>Site web: www.ecar.tn</p>
+  </div>
+</div> 
