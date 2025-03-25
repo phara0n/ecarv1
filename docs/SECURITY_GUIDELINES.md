@@ -1,387 +1,119 @@
-# eCar Garage Security Guidelines
+# eCar Garage Management Application - Security Guidelines
 
-This document outlines security best practices and implementations for the eCar Garage Management Application to ensure data protection, user privacy, and system integrity.
+This document outlines security practices and guidelines for the eCar Garage Management Application.
 
-## Authentication & Authorization
+## Authentication and Authorization
 
-### JWT Token Implementation
+### User Authentication
 
-The system uses JWT (JSON Web Tokens) for authentication with the following security measures:
+- The application uses JWT (JSON Web Tokens) for authentication
+- Passwords are hashed using BCrypt with appropriate work factor
+- Passwords must contain at least 8 characters, including uppercase, lowercase, and special characters
+- Account lockout after 5 failed login attempts
 
-1. **Short-lived tokens**: Access tokens expire after 2 hours
-2. **Refresh token mechanism**: Secure token rotation strategy
-3. **Secret key protection**: Using environment variables for JWT secrets
-4. **Claims validation**: Validating issuer, audience, and expiration
-5. **HMAC with SHA-256 (HS256) algorithm**: For token signing
+### Authorization
 
-Example backend implementation:
-
-```ruby
-# config/initializers/jwt.rb
-require 'jwt'
-
-module JwtAuth
-  SECRET_KEY = ENV['JWT_SECRET'] || Rails.application.secrets.secret_key_base
-
-  def self.encode(payload, exp = 2.hours.from_now)
-    payload[:exp] = exp.to_i
-    JWT.encode(payload, SECRET_KEY)
-  end
-
-  def self.decode(token)
-    decoded = JWT.decode(token, SECRET_KEY)[0]
-    HashWithIndifferentAccess.new(decoded)
-  rescue JWT::ExpiredSignature, JWT::VerificationError, JWT::DecodeError
-    nil
-  end
-end
-```
-
-### Role-Based Access Control
-
-The application implements a role-based access control system:
-
-1. **Admin**: Full access to all system features
-2. **Technician**: Access to vehicle repairs and service records
-3. **Receptionist**: Customer management and appointment scheduling
-4. **Customer**: Limited access to their own vehicles and service history
-
-Permissions are enforced at the API level in the backend:
-
-```ruby
-# app/controllers/application_controller.rb
-class ApplicationController < ActionController::API
-  before_action :authenticate_request
-  
-  def authenticate_request
-    header = request.headers['Authorization']
-    token = header.split(' ').last if header
-    decoded = JwtAuth.decode(token)
-    
-    if decoded
-      @current_user = User.find(decoded[:user_id])
-      @current_user_role = decoded[:role]
-    else
-      render json: { error: 'Unauthorized' }, status: :unauthorized
-    end
-  end
-  
-  def authorize_admin
-    unless @current_user_role == 'admin'
-      render json: { error: 'Forbidden' }, status: :forbidden
-    end
-  end
-  
-  # Other role-based authorization methods
-end
-```
-
-## Data Protection
-
-### Sensitive Data Encryption
-
-1. **Database-level encryption**: 
-   - Vehicle identification numbers (VINs)
-   - Customer personal information
-   - Payment details
-
-2. **Implementation using Rails Active Record Encryption**:
-
-```ruby
-# app/models/customer.rb
-class Customer < ApplicationRecord
-  encrypts :phone_number, :address
-  encrypts :national_id, deterministic: true
-end
-
-# app/models/vehicle.rb
-class Vehicle < ApplicationRecord
-  encrypts :vin, deterministic: true
-end
-```
-
-### HTTPS Implementation
-
-All communication between clients and the server is secured with HTTPS:
-
-1. **TLS 1.3**: Using the latest secure protocol
-2. **Strong cipher suites**: Implementing modern encryption standards
-3. **HSTS (HTTP Strict Transport Security)**: Enforced via Nginx configuration
-
-Nginx configuration example:
-
-```nginx
-server {
-  listen 443 ssl http2;
-  server_name api.ecar.tn;
-  
-  ssl_certificate /etc/letsencrypt/live/api.ecar.tn/fullchain.pem;
-  ssl_certificate_key /etc/letsencrypt/live/api.ecar.tn/privkey.pem;
-  
-  ssl_protocols TLSv1.2 TLSv1.3;
-  ssl_prefer_server_ciphers on;
-  ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305';
-  
-  add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-  
-  # Other configuration...
-}
-```
-
-### Secure Data Storage on Mobile Devices
-
-For the Flutter mobile application, sensitive data is stored securely using:
-
-1. **flutter_secure_storage**: For storing JWT tokens
-2. **Encrypted Shared Preferences**: For user preferences
-
-Implementation example:
-
-```dart
-// lib/services/auth_service.dart
-class AuthService {
-  final _storage = FlutterSecureStorage();
-  
-  Future<void> storeToken(String token) async {
-    await _storage.write(key: 'jwt_token', value: token);
-  }
-  
-  Future<String?> getToken() async {
-    return await _storage.read(key: 'jwt_token');
-  }
-  
-  Future<void> deleteToken() async {
-    await _storage.delete(key: 'jwt_token');
-  }
-}
-```
+- Role-based access control (RBAC) with the following roles:
+  - Admin: Full access to all features
+  - Manager: Access to customer and vehicle data, limited administrative capabilities
+  - Technician: Access to assigned repairs only
+  - Customer: Access to own vehicles and repair history only
+- Each API endpoint has appropriate authorization checks
 
 ## API Security
 
-### Input Validation & Sanitization
+### Endpoint Security
 
-All user inputs are validated and sanitized:
+- All API endpoints require authentication except public endpoints (login, registration)
+- Rate limiting is implemented to prevent brute force attacks
+- CORS is properly configured to allow only trusted origins
+- Sensitive operations require re-authentication
 
-1. **Strong parameter filtering** in Rails controllers
-2. **Type validation** for all incoming data
-3. **Data sanitization** to prevent XSS and injection attacks
+### Input Validation
 
-Example in Rails controller:
+- All user inputs are validated on both client and server sides
+- Parameterized queries are used to prevent SQL injection
+- Content Security Policy (CSP) is implemented to prevent XSS attacks
 
-```ruby
-# app/controllers/vehicles_controller.rb
-class VehiclesController < ApplicationController
-  def create
-    @vehicle = Vehicle.new(vehicle_params)
-    
-    if @vehicle.save
-      render json: @vehicle, status: :created
-    else
-      render json: { errors: @vehicle.errors.full_messages }, status: :unprocessable_entity
-    end
-  end
-  
-  private
-  
-  def vehicle_params
-    params.require(:vehicle).permit(:brand, :model, :year, :license_plate, :vin, :current_mileage)
-  end
-end
-```
+## Data Protection
 
-### Rate Limiting
+### Sensitive Data Handling
 
-API rate limiting protects against DoS attacks and API abuse:
+- Personal Identifiable Information (PII) is encrypted at rest
+- Credit card information is never stored; payment processing is handled by a third-party provider
+- Data minimization practices are followed - only necessary information is collected
 
-1. **Request throttling**: 100 requests per minute for authenticated users
-2. **IP-based rate limiting**: 30 requests per minute for unauthenticated requests
-3. **Login attempt limiting**: 5 attempts per 15 minutes
+### Data in Transit
 
-Implementation using Rack::Attack:
+- All communications use HTTPS/TLS 1.2+
+- Secure cookies with HttpOnly and Secure flags
+- HSTS is enabled to prevent downgrade attacks
 
-```ruby
-# config/initializers/rack_attack.rb
-class Rack::Attack
-  # Throttle login attempts
-  throttle('login/ip', limit: 5, period: 15.minutes) do |req|
-    req.ip if req.path == '/api/v1/login' && req.post?
-  end
-  
-  # Throttle API requests
-  throttle('api/ip', limit: 30, period: 1.minute) do |req|
-    req.ip if req.path.start_with?('/api/v1/')
-  end
-  
-  # Throttle authenticated API requests by user ID
-  throttle('api/user', limit: 100, period: 1.minute) do |req|
-    if req.path.start_with?('/api/v1/') && req.env['current_user_id']
-      req.env['current_user_id']
-    end
-  end
-end
-```
+## Infrastructure Security
 
-### CORS Configuration
+### Server Hardening
 
-Cross-Origin Resource Sharing is properly configured:
+- Security updates are applied regularly
+- Unused services and ports are disabled
+- Firewall is configured to allow only necessary traffic
+- Non-root users are used for running application services
 
-```ruby
-# config/initializers/cors.rb
-Rails.application.config.middleware.insert_before 0, Rack::Cors do
-  allow do
-    origins 'admin.ecar.tn', 'app.ecar.tn'
-    resource '/api/v1/*',
-      headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head],
-      credentials: true
-  end
-end
-```
+### Database Security
 
-## Security Monitoring & Incident Response
+- Database is not directly accessible from the public internet
+- Regular backups with encryption
+- Database credentials are stored securely, not in code repositories
+- Strong passwords are enforced for database users
 
-### Logging Strategy
+## Deployment Security
 
-The application implements comprehensive security logging:
+### Secrets Management
 
-1. **Authentication events**: Login attempts, successes, and failures
-2. **Authorization events**: Access attempts to restricted resources
-3. **Data access logs**: Tracking who accessed sensitive data
-4. **Admin actions**: Logging all administrative actions
+- Environment variables are used for secrets
+- `.env` files are excluded from version control
+- Different secrets are used for each environment (development, staging, production)
 
-Implementation example:
+### Docker Security
 
-```ruby
-# app/controllers/application_controller.rb
-def log_authentication(status, user_id = nil, ip = request.remote_ip)
-  SecurityLog.create(
-    event_type: 'authentication',
-    status: status,
-    user_id: user_id,
-    ip_address: ip,
-    details: {
-      user_agent: request.user_agent,
-      path: request.path
-    }
-  )
-end
-```
+- Latest security patches are applied to base images
+- Non-root users are used in containers
+- Container resources are limited appropriately
+- Network segmentation between containers
 
-### Vulnerability Scanning
+## Monitoring and Incident Response
 
-Regular security assessments include:
+### Logging and Monitoring
 
-1. **Dependency scanning**: Weekly checks for vulnerable dependencies
-2. **Static code analysis**: Using tools like Brakeman for Rails
-3. **Dynamic application scanning**: Monthly OWASP ZAP scans
+- Security-related events are logged with appropriate detail
+- Logs are stored securely and can't be modified
+- Unusual activity triggers alerts
+- Regular log reviews are conducted
 
-### Incident Response Plan
+### Incident Response
 
-In case of a security incident:
+- Security incident response plan is documented and tested
+- Contact information for security team is readily available
+- Procedures for reporting security vulnerabilities are established
 
-1. **Containment**: Immediate steps to isolate affected systems
-2. **Investigation**: Forensic analysis to determine the cause and impact
-3. **Remediation**: Implementing fixes and patches
-4. **Notification**: Informing affected users as required by law
-5. **Post-incident review**: Learning from the incident to improve security
+## Compliance
 
-## Mobile Application Security
+- Application follows GDPR requirements for European users
+- Privacy policy is clearly communicated to users
+- Data retention policies are implemented and enforced
+- Users can request deletion of their data
 
-### Certificate Pinning
+## Security Testing
 
-The mobile app implements certificate pinning to prevent MITM attacks:
+- Regular security testing is performed, including:
+  - Static Application Security Testing (SAST)
+  - Dynamic Application Security Testing (DAST)
+  - Dependency scanning for vulnerabilities
+  - Regular penetration testing
 
-```dart
-// lib/utils/http_client.dart
-class SecureHttpClient extends IOClient {
-  @override
-  Future<IOStreamedResponse> send(BaseRequest request) async {
-    var httpClient = HttpClient()
-      ..badCertificateCallback = (X509Certificate cert, String host, int port) {
-        final pinned = 'sha256/EXPECTED_CERTIFICATE_FINGERPRINT';
-        final fingerprint = sha256.convert(cert.der).toString();
-        return fingerprint == pinned;
-      };
-    
-    // Rest of the implementation
-  }
-}
-```
+## Reporting Security Issues
 
-### App Security Features
+If you discover a security vulnerability, please report it by sending an email to security@ecar.tn. Please do not disclose security vulnerabilities publicly until they have been addressed by our team.
 
-1. **Jailbreak/root detection**: Preventing use on compromised devices
-2. **Screenshot prevention**: For sensitive screens
-3. **App inactivity timeout**: Automatic logout after 10 minutes
-4. **Secure clipboard handling**: Preventing sensitive data in clipboard
+## Security Updates
 
-## Database Security
-
-### Database Access Controls
-
-1. **Least privilege principle**: Database users have only necessary permissions
-2. **Connection encryption**: SSL/TLS for all database connections
-3. **Database firewall**: Restricting database access to application servers only
-
-### Backup Encryption
-
-All database backups are encrypted:
-
-```bash
-#!/bin/bash
-BACKUP_DIR="/home/ecar/backups"
-TIMESTAMP=$(date +%Y%m%d_%H%M%S)
-DB_NAME="ecar_production"
-DB_USER="ecar"
-
-mkdir -p $BACKUP_DIR
-pg_dump -U $DB_USER $DB_NAME | \
-  gpg --encrypt --recipient backup@ecar.tn \
-  > $BACKUP_DIR/$DB_NAME-$TIMESTAMP.sql.gpg
-```
-
-## Security Updates & Patching
-
-The following schedule is maintained for security updates:
-
-1. **Critical vulnerabilities**: Patched within 24 hours
-2. **High severity**: Patched within 1 week
-3. **Medium severity**: Patched within 2 weeks
-4. **Low severity**: Patched within 1 month
-
-## Compliance Considerations
-
-The application is designed to comply with:
-
-1. **GDPR**: For handling European customer data
-2. **Tunisian Data Protection Law**: Local legal compliance
-3. **PCI DSS**: For handling payment information securely
-
-## Security Checklist for Developers
-
-- [ ] Use parameterized queries to prevent SQL injection
-- [ ] Validate and sanitize all user inputs
-- [ ] Implement proper error handling without leaking information
-- [ ] Apply the principle of least privilege for all operations
-- [ ] Use secure hashing functions (bcrypt) for passwords
-- [ ] Keep all dependencies up to date
-- [ ] Review code for security vulnerabilities
-- [ ] Follow secure coding standards and guidelines
-- [ ] Use HTTPS for all communications
-- [ ] Implement proper session management
-
-## Security Training
-
-All team members receive regular security training:
-
-1. **Secure coding practices**: For developers
-2. **Social engineering awareness**: For all staff
-3. **Data handling procedures**: For staff with access to customer data
-4. **Incident response drills**: For IT and management
-
-## Contact Information
-
-For reporting security vulnerabilities:
-
-- Email: security@ecar.tn
-- Responsible disclosure policy: https://ecar.tn/security
+This document will be updated as security measures evolve. Last updated: [Current Date].
