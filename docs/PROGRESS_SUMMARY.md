@@ -21,6 +21,7 @@ Last updated: April 2, 2025
   - Repair management system with status tracking and statistics
   - Invoice management system with status tracking, PDF generation, and email capabilities
   - Customer management system with detailed profiles, filtering, and comprehensive statistics
+  - Vehicle management system with brand-specific styling, service tracking, and mileage management
 - Used brand colors (BMW blue, Mercedes silver, VW dark blue)
 - Created responsive design that works on desktop and mobile devices
 
