@@ -113,10 +113,10 @@ This document outlines the functional and non-functional requirements for the eC
 - [x] Status tracking
 
 ### ✅ Invoice Data
-- [x] Line items (parts and labor)
-- [x] Tax calculations
+- [x] Basic invoice amount
 - [x] Payment tracking
 - [x] PDF generation
+- [x] Partial payment support
 
 ### 🔄 Inventory Data (In Progress)
 - [ ] Part numbers and descriptions

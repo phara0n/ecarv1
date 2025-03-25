@@ -9,9 +9,7 @@
     <h3>تفاصيل الفاتورة:</h3>
     <p><strong>رقم الفاتورة:</strong> <%= @invoice.invoice_number %></p>
     <p><strong>تاريخ الإصدار:</strong> <%= @invoice.issue_date %></p>
-    <p><strong>المبلغ (بدون ضريبة):</strong> <%= sprintf("%.3f", @invoice.amount) %> د.ت</p>
-    <p><strong>ضريبة القيمة المضافة (19%):</strong> <%= sprintf("%.3f", @invoice.tax_amount) %> د.ت</p>
-    <p><strong>المبلغ الإجمالي:</strong> <%= sprintf("%.3f", @invoice.total_amount) %> د.ت</p>
+    <p><strong>المبلغ:</strong> <%= sprintf("%.2f", @invoice.amount) %> د.ت</p>
     <p><strong>حالة الدفع:</strong> <%= t("enums.invoice.payment_status.#{@invoice.payment_status}") %></p>
     
     <h3>تفاصيل الإصلاح:</h3>

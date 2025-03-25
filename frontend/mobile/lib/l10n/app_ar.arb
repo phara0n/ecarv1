@@ -50,7 +50,6 @@
   "unpaid": "غير مدفوعة",
   "partial": "مدفوعة جزئياً",
   "amount": "المبلغ",
-  "vatAmount": "ضريبة القيمة المضافة",
   "totalAmount": "المبلغ الإجمالي",
   "payInvoice": "دفع الفاتورة",
   "selectPaymentMethod": "اختر طريقة الدفع",
@@ -65,8 +64,6 @@
   "remainingAmount": "المبلغ المتبقي",
   "paymentDate": "تاريخ الدفع",
   "dueDate": "تاريخ الاستحقاق",
-  "fiscalId": "الرقم الضريبي",
-  "commercialRegistry": "السجل التجاري",
   "noPdfAvailable": "لا يوجد ملف PDF متاح",
   
   "profileTitle": "الملف الشخصي",

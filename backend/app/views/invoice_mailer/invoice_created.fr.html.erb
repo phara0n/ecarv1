@@ -9,9 +9,7 @@
     <h3>Détails de la facture:</h3>
     <p><strong>Numéro de facture:</strong> <%= @invoice.invoice_number %></p>
     <p><strong>Date d'émission:</strong> <%= @invoice.issue_date %></p>
-    <p><strong>Montant HT:</strong> <%= sprintf("%.3f", @invoice.amount) %> TND</p>
-    <p><strong>TVA (19%):</strong> <%= sprintf("%.3f", @invoice.tax_amount) %> TND</p>
-    <p><strong>Montant TTC:</strong> <%= sprintf("%.3f", @invoice.total_amount) %> TND</p>
+    <p><strong>Montant:</strong> <%= sprintf("%.2f", @invoice.amount) %> TND</p>
     <p><strong>Statut de paiement:</strong> <%= t("enums.invoice.payment_status.#{@invoice.payment_status}") %></p>
     
     <h3>Détails de la réparation:</h3>

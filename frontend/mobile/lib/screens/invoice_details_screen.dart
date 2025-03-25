@@ -149,40 +149,40 @@ class _InvoiceDetailsScreenState extends State<InvoiceDetailsScreen> {
             ),
             SizedBox(height: 16),
             
-            // Pre-tax amount
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("${localizations.amount} (HT):"),
-                Text(currencyFormat.format(invoice.amount)),
-              ],
-            ),
-            SizedBox(height: 8),
-            
-            // Tunisian VAT amount (19%)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("TVA (19%):"),
-                Text(currencyFormat.format(invoice.taxAmount)),
-              ],
-            ),
-            Divider(),
-            
             // Total amount
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Total (TTC):",
+                  localizations.totalAmount,
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 Text(
-                  currencyFormat.format(invoice.totalAmount),
+                  currencyFormat.format(invoice.amount),
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
               ],
             ),
+            
+            // If partially paid, show the paid amount and remaining amount
+            if (invoice.isPartiallyPaid) ...[
+              SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(localizations.paidAmount),
+                  Text(currencyFormat.format(invoice.paidAmount ?? 0)),
+                ],
+              ),
+              SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(localizations.remainingAmount),
+                  Text(currencyFormat.format(invoice.remainingAmount)),
+                ],
+              ),
+            ],
           ],
         ),
       ),

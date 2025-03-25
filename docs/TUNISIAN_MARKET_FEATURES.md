@@ -22,17 +22,11 @@ This document outlines the features and customizations specific to the Tunisian 
 
 ## Financial & Legal Compliance
 
-### Tunisian Tax System
-- **TVA (VAT) Implementation**: 
-  - Automatic calculation of 19% VAT on all invoices
-  - Clear separation of pre-tax and tax amounts
-  - Tax exemption handling for eligible business customers
-
-### Facturation Normalisée
-- **Compliance with Tunisian tax requirements**:
-  - Sequential invoice numbering system
-  - Required fields according to Tunisian fiscal law
-  - QR code generation for digital verification
+### Simple Invoice System
+- **Simplified Invoice Management**: 
+  - Basic invoice amount without complex tax calculations
+  - PDF generation for invoice records
+  - Multiple payment methods support
 
 ### Payment Methods
 - **Cash Payment Tracking**:
@@ -40,9 +34,9 @@ This document outlines the features and customizations specific to the Tunisian 
   - Cash payment reports for accounting purposes
   
 - **Installment Payment Support**:
-  - Tunisian-style installment plan creation
+  - Support for partial payments
   - Payment schedule tracking
-  - Notification system for upcoming installments
+  - Notification system for upcoming payments
 
 ## Vehicle & Service Customization
 

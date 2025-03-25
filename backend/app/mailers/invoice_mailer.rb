@@ -7,7 +7,7 @@ class InvoiceMailer < ApplicationMailer
     
     # Set locale based on customer preference
     I18n.with_locale(@customer.preferred_locale || I18n.default_locale) do
-      attachments["facture_#{@invoice.invoice_number.gsub('/', '_')}.pdf"] = @invoice.pdf_file.download if @invoice.pdf_file.attached?
+      attachments["invoice_#{@invoice.invoice_number.gsub('/', '_')}.pdf"] = @invoice.pdf_file.download if @invoice.pdf_file.attached?
       
       mail(
         to: @customer.email,
@@ -37,7 +37,7 @@ class InvoiceMailer < ApplicationMailer
     
     # Set locale based on customer preference
     I18n.with_locale(@customer.preferred_locale || I18n.default_locale) do
-      attachments["facture_#{@invoice.invoice_number.gsub('/', '_')}.pdf"] = @invoice.pdf_file.download if @invoice.pdf_file.attached?
+      attachments["invoice_#{@invoice.invoice_number.gsub('/', '_')}.pdf"] = @invoice.pdf_file.download if @invoice.pdf_file.attached?
       
       mail(
         to: @customer.email,

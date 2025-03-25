@@ -9,8 +9,6 @@ class Invoice {
   final int id;
   final String invoiceNumber;
   final double amount;
-  final double taxAmount;  // VAT amount (19% in Tunisia)
-  final double totalAmount;
   final String issueDate;
   final String? dueDate;
   final String paymentStatus;  // 'unpaid', 'partial', 'paid'
@@ -18,10 +16,6 @@ class Invoice {
   final double? paidAmount;
   final String? paymentDate;
   final String? pdfUrl;
-  
-  // Tunisian fiscal information
-  final String? fiscalId;
-  final String? commercialRegistry;
   
   // Related entities
   final Repair repair;
@@ -31,8 +25,6 @@ class Invoice {
     required this.id,
     required this.invoiceNumber,
     required this.amount,
-    required this.taxAmount,
-    required this.totalAmount,
     required this.issueDate,
     this.dueDate,
     required this.paymentStatus,
@@ -40,8 +32,6 @@ class Invoice {
     this.paidAmount,
     this.paymentDate,
     this.pdfUrl,
-    this.fiscalId,
-    this.commercialRegistry,
     required this.repair,
     required this.customer,
   });
@@ -57,17 +47,12 @@ class Invoice {
   // Calculate remaining amount for partially paid invoices
   double get remainingAmount {
     if (isPaid) return 0;
-    if (isUnpaid) return totalAmount;
-    return totalAmount - (paidAmount ?? 0);
+    if (isUnpaid) return amount;
+    return amount - (paidAmount ?? 0);
   }
   
-  // Helper to calculate Tunisian VAT (19%)
-  static double calculateVAT(double amount) {
-    return amount * 0.19;
-  }
-  
-  // Helper to format number with 3 decimals (Tunisian standard)
+  // Helper to format number with 2 decimals
   static String formatAmount(double amount) {
-    return amount.toStringAsFixed(3);
+    return amount.toStringAsFixed(2);
   }
 } 

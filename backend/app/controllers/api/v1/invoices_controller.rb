@@ -55,12 +55,8 @@ module Api
         
         @invoice = Invoice.new(invoice_params)
         
-        # Set default values for Tunisian invoice requirements
-        @invoice.fiscal_id = "123456789" # Example fiscal ID
-        @invoice.commercial_registry = "B987654321" # Example commercial registry
-        
         if @invoice.save
-          # Generate PDF with Tunisian "Facturation Normalisée" format
+          # Generate PDF for the invoice
           @invoice.generate_pdf
           
           # Send notification to customer about new invoice
@@ -77,8 +73,8 @@ module Api
         authorize @invoice
         
         if @invoice.update(invoice_params)
-          # Regenerate PDF if amounts changed
-          @invoice.generate_pdf if invoice_params[:amount].present? || invoice_params[:tax_amount].present?
+          # Regenerate PDF if amount changed
+          @invoice.generate_pdf if invoice_params[:amount].present?
           
           render json: @invoice, serializer: InvoiceDetailSerializer
         else
@@ -110,7 +106,7 @@ module Api
       def update_payment
         authorize @invoice
         
-        # Handle partial payments (common in Tunisia)
+        # Handle payments
         if payment_params[:payment_method].present? && payment_params[:paid_amount].present?
           paid_amount = payment_params[:paid_amount].to_f
           
@@ -120,7 +116,7 @@ module Api
           @invoice.payment_method = payment_params[:payment_method]
           
           # Set payment status based on paid amount
-          if paid_amount >= @invoice.total_amount
+          if paid_amount >= @invoice.amount
             @invoice.payment_status = :paid
           elsif paid_amount > 0
             @invoice.payment_status = :partial
@@ -152,7 +148,6 @@ module Api
           :repair_id, 
           :customer_id, 
           :amount, 
-          :tax_amount, 
           :issue_date, 
           :due_date, 
           :payment_status, 
