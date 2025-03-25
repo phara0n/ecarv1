@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'customers_screen.dart';
 import 'vehicles_screen.dart';
+import 'repairs_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -33,7 +34,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     {
       'icon': Icons.build,
       'label': 'Repairs',
-      'screen': const Center(child: Text('Repairs Screen - Coming Soon')),
+      'screen': const RepairsScreen(),
     },
     {
       'icon': Icons.receipt,

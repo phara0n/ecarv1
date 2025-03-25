@@ -233,15 +233,16 @@ class _RepairsScreenState extends State<RepairsScreen> with SingleTickerProvider
       orElse: () => _vehicles.isNotEmpty ? _vehicles.first : Vehicle(
         id: 0,
         customerId: 0,
-        brand: 'Unknown',
+        brand: VehicleBrand.bmw,
         model: 'Unknown',
         year: DateTime.now().year,
         licensePlate: 'Unknown',
         currentMileage: 0,
-        averageDailyUsage: 0,
+        lastServiceMileage: 0,
         lastServiceDate: DateTime.now(),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        isActive: false,
       ),
     );
     
@@ -386,15 +387,16 @@ class _RepairsScreenState extends State<RepairsScreen> with SingleTickerProvider
       orElse: () => Vehicle(
         id: 0,
         customerId: 0,
-        brand: 'Unknown',
+        brand: VehicleBrand.bmw,
         model: 'Unknown',
         year: DateTime.now().year,
         licensePlate: 'Unknown',
         currentMileage: 0,
-        averageDailyUsage: 0,
+        lastServiceMileage: 0,
         lastServiceDate: DateTime.now(),
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        isActive: false,
       ),
     );
     
@@ -411,6 +413,10 @@ class _RepairsScreenState extends State<RepairsScreen> with SingleTickerProvider
         phone: '',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        vehicleCount: 0,
+        repairCount: 0,
+        totalSpent: 0.0,
+        isActive: false,
       ),
     );
     
