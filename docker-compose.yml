@@ -1,0 +1,117 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:13
+    container_name: ecar-postgres
+    restart: always
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ecar
+      POSTGRES_PASSWORD: StrongPassword123!
+      POSTGRES_DB: ecar_production
+    ports:
+      - "5432:5432"
+    networks:
+      - ecar-network
+
+  # Redis for Caching and Background Jobs
+  redis:
+    image: redis:6
+    container_name: ecar-redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - ecar-network
+
+  # Backend API (Rails)
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecar-api
+    restart: always
+    depends_on:
+      - db
+      - redis
+    environment:
+      RAILS_ENV: production
+      DATABASE_URL: postgres://ecar:StrongPassword123!@db/ecar_production
+      REDIS_URL: redis://redis:6379/1
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      JWT_SECRET: ${JWT_SECRET}
+    volumes:
+      - ./backend:/app
+      - ./backend/log:/app/log
+    networks:
+      - ecar-network
+
+  # Sidekiq for Background Jobs
+  sidekiq:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecar-sidekiq
+    command: bundle exec sidekiq
+    restart: always
+    depends_on:
+      - db
+      - redis
+      - api
+    environment:
+      RAILS_ENV: production
+      DATABASE_URL: postgres://ecar:StrongPassword123!@db/ecar_production
+      REDIS_URL: redis://redis:6379/1
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      JWT_SECRET: ${JWT_SECRET}
+    volumes:
+      - ./backend:/app
+      - ./backend/log:/app/log
+    networks:
+      - ecar-network
+
+  # Web Admin (Flutter Web)
+  web:
+    build:
+      context: ./frontend/web
+      dockerfile: Dockerfile
+    container_name: ecar-web
+    restart: always
+    volumes:
+      - web_build:/usr/share/nginx/html
+    networks:
+      - ecar-network
+
+  # Nginx as Reverse Proxy
+  nginx:
+    image: nginx:latest
+    container_name: ecar-nginx
+    restart: always
+    depends_on:
+      - api
+      - web
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - web_build:/var/www/ecar-admin
+      - ./nginx/logs:/var/log/nginx
+      - /etc/letsencrypt:/etc/letsencrypt
+    networks:
+      - ecar-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  web_build:
+
+networks:
+  ecar-network:
+    driver: bridge 
