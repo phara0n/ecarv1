@@ -163,7 +163,10 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
   
   void _updateModelOptions(String brand) {
     setState(() {
-      _selectedBrand = VehicleBrand(name: brand);
+      _selectedBrand = VehicleBrand.values.firstWhere(
+        (b) => b.toString().split('.').last.toLowerCase() == brand.toLowerCase(),
+        orElse: () => VehicleBrand.other
+      );
       _yearController.text = '';
     });
   }
@@ -451,7 +454,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
                     children: [
                       Text(
                         _isEditing ? 'Edit Vehicle' : 'Add New Vehicle',
-                        style: Theme.of(context).textTheme.headline6,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       IconButton(
                         icon: const Icon(Icons.close),
@@ -853,6 +856,10 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
         phone: '',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        vehicleCount: 0,
+        repairCount: 0,
+        totalSpent: 0.0,
+        isActive: false,
       ),
     );
     
@@ -879,7 +886,7 @@ class _VehiclesScreenState extends State<VehiclesScreen> with SingleTickerProvid
           // Statistics cards
           Text(
             'Vehicle Statistics',
-            style: Theme.of(context).textTheme.headline6,
+            style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 16),
           
