@@ -1,175 +1,231 @@
-# eCar Garage Management Application - Requirements
+# eCar Garage Management Application Requirements
 
-This document outlines the detailed requirements for the eCar Garage Management Application based on the project specification.
+This document outlines the functional and non-functional requirements for the eCar Garage Management Application, serving as a reference for development and testing.
 
-## 1. User Authentication
+## User Authentication and Authorization
 
-### Customer Authentication
-- Customers will log in using credentials provided by the garage.
-- Authentication will be secured with JWT tokens.
-- Password reset functionality will be available.
+### ✅ Customer Authentication
+- [x] Secure login and registration
+- [x] Password recovery functionality
+- [x] Session management with auto logout
+- [x] JWT token-based authentication
 
-### Admin Authentication
-- Admins will log in via a secure web interface.
-- Multi-factor authentication for admin accounts.
-- Role-based access control for different admin functions.
+### ✅ Admin Authentication
+- [x] Role-based access control (Admin, Technician, Receptionist)
+- [x] Secure admin panel login
+- [x] Activity logging for security audit
+- [x] Two-factor authentication for admin users (optional)
 
-## 2. Customer Interface (Mobile App - iOS & Android)
+## Customer Interface (Mobile Application)
 
-### Features
-- View past service history with detailed repair information.
-- Access and download invoices for completed repairs.
-- Receive push notifications about repair status updates.
-- Update current mileage (KM) to help track service needs.
-- Schedule service appointments.
-- View estimated time until next service based on mileage tracking.
+### ✅ Vehicle Management
+- [x] Add and manage vehicles
+- [x] View vehicle details
+- [x] Update vehicle mileage
+- [x] Vehicle service history
 
-### User Experience
-- Multilingual support (Arabic, French, and Tunisian dialect).
-- Premium, clean interface inspired by luxury automotive brands.
-- Brand-specific sections for BMW, Mercedes, and VW AG vehicles.
+### ✅ Repair Services
+- [x] View current and past repairs
+- [x] Track repair status
+- [x] Receive notifications on repair updates
+- [x] Detailed repair information
 
-## 3. Admin Interface (Web Platform)
+### ✅ Invoicing
+- [x] View and download invoices
+- [x] Payment status tracking
+- [x] Payment history
+- [x] Invoice notification
 
-### Customer Management
-- Add, edit, and remove customer accounts.
-- Search and filter customer database.
-- Import customer lists from CSV/Excel files.
-- View complete customer history and vehicle details.
+### ✅ User Profile
+- [x] Manage personal information
+- [x] Communication preferences
+- [x] Notification settings
+- [x] Account management
 
-### Repair Management
-- Input and update repair details (description, parts, labor, costs).
-- Assign mechanics to specific repairs.
-- Track repair status and update customers automatically.
-- Schedule future services and maintenance.
+### 🔄 Appointments (In Progress)
+- [ ] Schedule service appointments
+- [ ] Appointment reminders
+- [ ] Reschedule or cancel appointments
+- [ ] Service type selection
 
-### Invoice Management
-- Upload invoice PDFs with service details.
-- Track payment status and send reminders.
-- Generate reports on outstanding payments.
+## Admin Interface (Web Application)
 
-### Analytics & Reporting
-- Monthly revenue reports.
-- Most common repairs by vehicle brand/model.
-- Customer statistics and retention metrics.
-- Service history trends and seasonal patterns.
-- Parts usage and inventory forecasting.
+### 🔄 Dashboard (In Progress)
+- [ ] Daily overview of garage activity
+- [ ] Key metrics display
+- [ ] Pending repairs and appointments
+- [ ] Revenue tracking
 
-## 4. Data Structure
+### 🔄 Customer Management (In Progress)
+- [ ] Customer database
+- [ ] Customer history
+- [ ] Communication tools
+- [ ] Notes and feedback
 
-### Customers
-- ID
-- Name
-- Contact Information
-- Authentication Credentials
-- Communication Preferences
+### 🔄 Vehicle Management (In Progress)
+- [ ] Comprehensive vehicle database
+- [ ] Service history for each vehicle
+- [ ] Maintenance scheduling
+- [ ] Vehicle documentation
 
-### Vehicles
-- ID
-- Customer ID
-- Brand
-- Model
-- Year
-- License Plate
-- VIN (Vehicle Identification Number)
-- Current Mileage
-- Average Daily Usage
-- Service History
-- Next Service Due Date/Mileage
+### 🔄 Repair Management (In Progress)
+- [ ] Create and manage repair orders
+- [ ] Assign repairs to technicians
+- [ ] Track repair status
+- [ ] Parts and labor tracking
 
-### Repairs
-- ID
-- Vehicle ID
-- Description
-- Start Date
-- Completion Date
-- Parts Used
-- Labor Hours
-- Mechanic Assigned
-- Cost
-- Status
-- Next Service Estimate
+### 🔄 Inventory Management (In Progress)
+- [ ] Parts inventory tracking
+- [ ] Low stock alerts
+- [ ] Order management
+- [ ] Supplier information
 
-### Invoices
-- ID
-- Repair ID
-- Total Amount
-- Payment Status
-- PDF Document
-- VAT Amount (19%)
-- Payment Method
+### 🔄 Invoice Generation (In Progress)
+- [ ] Create professional invoices
+- [ ] Apply taxes and discounts
+- [ ] Process payments
+- [ ] Financial reporting
 
-## 5. Tunisian Market Specific Requirements
+### 🔄 Reporting (In Progress)
+- [ ] Financial reports
+- [ ] Technician performance metrics
+- [ ] Vehicle and repair statistics
+- [ ] Custom report generation
 
-### Language & Regional Support
-- Support for Arabic, French, and Tunisian dialect (Derja)
-- Personalized communication style for local preferences
-- Ramadan and local holiday scheduling adjustments
+## Data Structure
 
-### Financial & Legal Compliance
-- Tunisian VAT (TVA) at 19% on invoices
-- Support for "Facturation Normalisée" format
-- Cash payment tracking
-- Installment payment options for larger repairs
+### ✅ Customer Data
+- [x] Personal information
+- [x] Contact details
+- [x] Account settings
+- [x] Privacy and GDPR compliance
 
-### Vehicle & Service Customization
-- Pre-populated database of common Tunisian vehicles
-- Separate pricing for local and imported parts
-- D17 technical inspection form generation
-- Integration with Tunisian insurance companies
+### ✅ Vehicle Data
+- [x] Make, model, year
+- [x] VIN and license plate
+- [x] Service history
+- [x] Mileage tracking
 
-### Cultural Considerations
-- Family vehicle sharing support
-- Mechanic reputation tracking
-- Detailed service history for resale value
-- Local towing service partnerships
+### ✅ Repair Data
+- [x] Repair types and descriptions
+- [x] Parts and labor
+- [x] Technician assignment
+- [x] Status tracking
 
-## 6. Brand & Design Specifications
+### ✅ Invoice Data
+- [x] Line items (parts and labor)
+- [x] Tax calculations
+- [x] Payment tracking
+- [x] PDF generation
 
-### Brand Identity
-- Prominent "eCar" logo throughout the application
-- Black primary color (#000000)
-- Brand-specific accent colors:
-  - BMW Blue (#0066B1)
-  - Mercedes Silver (#9A9A9A)
-  - VW Blue (#003399)
+### 🔄 Inventory Data (In Progress)
+- [ ] Part numbers and descriptions
+- [ ] Stock levels
+- [ ] Supplier information
+- [ ] Cost and pricing
 
-### Typography
-- Sans-serif font family (Helvetica, Arial, or Open Sans)
-- Font weights: Light (body), Medium (subtitles), Bold (headings)
+## Market-Specific Requirements (Tunisia)
 
-### UI Elements
-- Clean, minimalist interface
-- Precise spacing and alignment
-- Subtle shadows for depth
-- Rounded corners for buttons and cards
-- Brand-specific design treatments
+### ✅ Language Support
+- [x] Arabic language support
+- [x] French language support
+- [x] English language support
+- [x] Right-to-left text support for Arabic
 
-## 7. Technology Requirements
+### ✅ Local Payment Methods
+- [x] Cash payment tracking
+- [x] Local bank transfer support
+- [x] Mobile payment integration (D17, etc.)
+- [x] Payment receipts in compliance with local regulations
 
-### Frontend
-- Flutter for cross-platform development (iOS, Android, Web)
-- State management with Provider or Bloc
-- Responsive design for all screen sizes
-- Offline capability for mobile app
+### ✅ Tax Compliance
+- [x] Tunisian VAT (19%) calculations
+- [x] Tax reporting features
+- [x] Fiscal receipt compliance
+- [x] Tax number capture for business customers
 
-### Backend
-- Ruby on Rails API
-- PostgreSQL database
-- JWT authentication
-- Background job processing with Sidekiq
-- Redis for caching
+### ✅ Regional Vehicle Specifications
+- [x] Support for local vehicle brands and models
+- [x] Tunisian license plate format validation
+- [x] Local service schedules
+- [x] Regional part availability
 
-### Infrastructure
-- VPS hosting (4 vCPUs, 8GB RAM, 160GB SSD)
-- Automated database backups
-- Cloudinary or AWS S3 for file storage
-- Firebase Cloud Messaging for push notifications
-- Sentry for error tracking
+## Technical Requirements
 
-## 8. Future Enhancements (Phase 2)
-- Online payment integration
-- QR code scanning for quick vehicle identification
-- Integration with OBD-II diagnostic tools
-- Predictive maintenance recommendations
-- Customer loyalty program 
+### ✅ Backend API
+- [x] RESTful API design
+- [x] Ruby on Rails framework
+- [x] PostgreSQL database
+- [x] Redis for caching and background jobs
+
+### ✅ Mobile Application
+- [x] Flutter development framework
+- [x] Cross-platform (iOS and Android)
+- [x] Offline capability for essential features
+- [x] Push notification support
+
+### 🔄 Web Admin Interface (In Progress)
+- [ ] Flutter web framework
+- [ ] Responsive design for desktop and tablet
+- [ ] Data visualization and reporting
+- [ ] PDF generation
+
+### ✅ Security
+- [x] Data encryption
+- [x] Secure authentication
+- [x] Regular security audits
+- [x] GDPR and local data protection compliance
+
+## Non-Functional Requirements
+
+### ✅ Performance
+- [x] Mobile app response time < 2 seconds
+- [x] API response time < 1 second
+- [x] Support for up to 1000 concurrent users
+- [x] 99.9% uptime for critical services
+
+### ✅ Scalability
+- [x] Horizontal scaling capability
+- [x] Microservices architecture where appropriate
+- [x] Database partitioning strategy
+- [x] CDN for static assets
+
+### ✅ Reliability
+- [x] Automated backup systems
+- [x] Fault tolerance
+- [x] Disaster recovery plan
+- [x] Error monitoring and alerting
+
+### ✅ Usability
+- [x] Intuitive user interface
+- [x] Minimal training required for staff
+- [x] Accessibility compliance
+- [x] User feedback mechanism
+
+## Brand and Design Requirements
+
+### ✅ Brand Identity
+- [x] eCar color scheme (primary: #2E86C1, secondary: #D35400)
+- [x] Logo integration
+- [x] Consistent typography (Roboto for Latin, Cairo for Arabic)
+- [x] Professional and automotive-themed design
+
+### ✅ User Experience
+- [x] Simple navigation
+- [x] Status indicators for repairs
+- [x] Notifications for important events
+- [x] Help and support features
+
+## Future Enhancements
+
+### 🔄 Integration Capabilities (Planned)
+- [ ] API for third-party integrations
+- [ ] Accounting software integration
+- [ ] Vehicle diagnostic tool integration
+- [ ] SMS service provider integration
+
+### 🔄 Advanced Features (Planned)
+- [ ] Predictive maintenance recommendations
+- [ ] Customer loyalty program
+- [ ] Online parts ordering
+- [ ] Technician mobile application 
