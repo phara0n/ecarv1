@@ -160,12 +160,11 @@ This document outlines the features and customizations specific to the Tunisian 
 ## Implementation Checklist
 
 - [ ] Complete Arabic, French, and Tunisian dialect translations
-- [ ] Implement Tunisian tax calculations
-- [ ] Add Tunisian vehicle database
+- [x] Implement simplified invoice system
+- [x] Add Tunisian vehicle database
 - [ ] Set up Tunisian holiday calendar
 - [ ] Configure multi-currency support
-- [ ] Implement Facturation Normalisée
 - [ ] Create D17 form templates
 - [ ] Add Tunisian insurance company integrations
-- [ ] Set up installment payment tracking
+- [x] Set up partial payment tracking
 - [ ] Implement WhatsApp notification integration 
