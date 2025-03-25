@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'screens/login_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/notification_preferences_screen.dart';
 import 'services/auth_service.dart';
+import 'services/notification_service.dart';
 
-void main() {
+void main() async {
+  // Ensure Flutter is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Firebase
+  await Firebase.initializeApp();
+  
+  // Initialize notification service
+  await NotificationService().initialize();
+  
   runApp(const ECarApp());
 }
 
@@ -32,19 +45,18 @@ class ECarApp extends StatelessWidget {
           onTertiaryContainer: const Color(0xFF003399), // VW Blue
         ),
         
-        // Define the default font family.
-        fontFamily: 'Helvetica',
-        
-        // Define the default TextTheme.
-        textTheme: const TextTheme(
-          displayLarge: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
-          displayMedium: TextStyle(fontSize: 36.0, fontWeight: FontWeight.bold),
-          displaySmall: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
-          headlineMedium: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
-          titleLarge: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
-          bodyLarge: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w300),
-          bodyMedium: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w300),
-          labelLarge: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+        // Use Google Fonts instead of local font files
+        textTheme: GoogleFonts.openSansTextTheme(
+          const TextTheme(
+            displayLarge: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
+            displayMedium: TextStyle(fontSize: 36.0, fontWeight: FontWeight.bold),
+            displaySmall: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
+            headlineMedium: TextStyle(fontSize: 20.0, fontWeight: FontWeight.w500),
+            titleLarge: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+            bodyLarge: TextStyle(fontSize: 16.0, fontWeight: FontWeight.w300),
+            bodyMedium: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w300),
+            labelLarge: TextStyle(fontSize: 14.0, fontWeight: FontWeight.w500),
+          ),
         ),
         
         // Define button styles
@@ -105,6 +117,7 @@ class ECarApp extends StatelessWidget {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
         '/home': (context) => const HomeScreen(),
+        '/notifications': (context) => const NotificationPreferencesScreen(),
       },
       
       // Start the app

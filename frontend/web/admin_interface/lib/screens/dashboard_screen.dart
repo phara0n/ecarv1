@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'customers_screen.dart';
+import 'vehicles_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -27,7 +28,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     {
       'icon': Icons.directions_car,
       'label': 'Vehicles',
-      'screen': const Center(child: Text('Vehicles Screen - Coming Soon')),
+      'screen': const VehiclesScreen(),
     },
     {
       'icon': Icons.build,

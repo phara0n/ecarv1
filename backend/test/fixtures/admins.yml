@@ -1,0 +1,4 @@
+# Admin fixture for testing - we'll define an admin in the customer model
+
+# The admin fixture is not used since we're authenticating via Customer model
+# This file is kept as a placeholder 

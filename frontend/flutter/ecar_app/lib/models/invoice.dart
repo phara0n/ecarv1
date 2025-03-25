@@ -7,6 +7,9 @@ class Invoice {
   final double? vatAmount;
   final String? paymentMethod;
   final double totalWithVat;
+  final DateTime date;
+  final DateTime? dueDate;
+  final DateTime? paymentDate;
   
   Invoice({
     required this.id,
@@ -17,6 +20,9 @@ class Invoice {
     this.vatAmount,
     this.paymentMethod,
     required this.totalWithVat,
+    required this.date,
+    this.dueDate,
+    this.paymentDate,
   });
   
   factory Invoice.fromJson(Map<String, dynamic> json) {
@@ -29,6 +35,15 @@ class Invoice {
       vatAmount: json['vat_amount']?.toDouble(),
       paymentMethod: json['payment_method'],
       totalWithVat: json['total_with_vat']?.toDouble() ?? json['amount'].toDouble(),
+      date: json['date'] != null 
+          ? DateTime.parse(json['date']) 
+          : DateTime.now(),
+      dueDate: json['due_date'] != null 
+          ? DateTime.parse(json['due_date']) 
+          : null,
+      paymentDate: json['payment_date'] != null 
+          ? DateTime.parse(json['payment_date']) 
+          : null,
     );
   }
   
@@ -41,6 +56,9 @@ class Invoice {
       'pdf_document': pdfDocument,
       'vat_amount': vatAmount,
       'payment_method': paymentMethod,
+      'date': date.toIso8601String().split('T').first,
+      'due_date': dueDate?.toIso8601String().split('T').first,
+      'payment_date': paymentDate?.toIso8601String().split('T').first,
     };
   }
   

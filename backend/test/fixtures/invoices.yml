@@ -1,0 +1,33 @@
+# Invoices fixture for testing
+
+one:
+  id: 1
+  repair: repair_one
+  customer: admin
+  amount: 150.00
+  invoice_number: "INV-2025-001"
+  payment_status: unpaid
+  payment_method: nil
+  paid_amount: 0
+  issue_date: <%= Date.current %>
+  due_date: <%= 30.days.from_now.to_date %>
+  date: <%= Date.current %>
+  pdf_document: "invoice_1.pdf"
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %>
+  
+two:
+  id: 2
+  repair: repair_two
+  customer: customer_one
+  amount: 200.00
+  invoice_number: "INV-2025-002"
+  payment_status: unpaid
+  payment_method: nil
+  paid_amount: 0
+  issue_date: <%= Date.current %>
+  due_date: <%= 30.days.from_now.to_date %>
+  date: <%= Date.current %>
+  pdf_document: "invoice_2.pdf"
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %> 

@@ -11,6 +11,10 @@ class Repair {
   final double? laborHours;
   final DateTime? nextServiceEstimate;
   final int? totalDays;
+  final DateTime date;
+  final String? notes;
+  final DateTime? nextServiceDueDate;
+  final String? nextServiceDescription;
   
   Repair({
     required this.id,
@@ -25,6 +29,10 @@ class Repair {
     this.laborHours,
     this.nextServiceEstimate,
     this.totalDays,
+    required this.date,
+    this.notes,
+    this.nextServiceDueDate,
+    this.nextServiceDescription,
   });
   
   factory Repair.fromJson(Map<String, dynamic> json) {
@@ -45,6 +53,14 @@ class Repair {
           ? DateTime.parse(json['next_service_estimate']) 
           : null,
       totalDays: json['total_days'],
+      date: json['date'] != null 
+          ? DateTime.parse(json['date']) 
+          : DateTime.now(),
+      notes: json['notes'],
+      nextServiceDueDate: json['next_service_due_date'] != null 
+          ? DateTime.parse(json['next_service_due_date']) 
+          : null,
+      nextServiceDescription: json['next_service_description'],
     );
   }
   
@@ -61,6 +77,10 @@ class Repair {
       'parts_used': partsUsed,
       'labor_hours': laborHours,
       'next_service_estimate': nextServiceEstimate?.toIso8601String().split('T').first,
+      'date': date.toIso8601String().split('T').first,
+      'notes': notes,
+      'next_service_due_date': nextServiceDueDate?.toIso8601String().split('T').first,
+      'next_service_description': nextServiceDescription,
     };
   }
   

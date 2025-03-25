@@ -1,0 +1,23 @@
+# Customers fixture for testing
+
+admin:
+  id: 1
+  name: Admin User
+  email: admin@ecar.tn
+  password_digest: <%= BCrypt::Password.create('password123') rescue '$2a$12$K0ByB.6YI2/OYrB4fQOAqu.0yye5Jb1h9xBEyIwZeKVpMO/p6I9Rm' %>
+  phone: +216 98 765 432
+  address: 10 Rue de Tunis, Tunis
+  role: admin
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %>
+
+customer_one:
+  id: 2
+  name: John Doe
+  email: customer@example.com
+  password_digest: <%= BCrypt::Password.create('password123') rescue '$2a$12$K0ByB.6YI2/OYrB4fQOAqu.0yye5Jb1h9xBEyIwZeKVpMO/p6I9Rm' %>
+  phone: +216 29 123 456
+  address: 15 Rue de Carthage, Tunis
+  role: customer
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %> 

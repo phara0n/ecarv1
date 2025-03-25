@@ -5,6 +5,12 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
+  # Health check endpoint
+  get 'health_check', to: 'health#check'
+
+  # Root path
+  root 'home#index'
+
   # API routes
   namespace :api do
     namespace :v1 do
@@ -12,21 +18,35 @@ Rails.application.routes.draw do
       post '/login', to: 'authentication#login'
       
       # Customer routes
-      resources :customers
+      resources :customers, only: [:index, :show, :create, :update, :destroy] do
+        collection do
+          get 'me', to: 'customers#me'
+        end
+      end
       
-      # Vehicle routes with nested resources
-      resources :vehicles do
-        # Update mileage endpoint
-        patch :update_mileage, on: :member
-        
-        # Repair routes with nested invoice resource
-        resources :repairs do
-          resources :invoices
+      # Vehicle routes
+      resources :vehicles, only: [:index, :show, :create, :update, :destroy] do
+        member do
+          patch 'update_mileage'
+        end
+      end
+      
+      # Repair routes
+      resources :repairs, only: [:index, :show, :create, :update, :destroy] do
+        collection do
+          get 'upcoming'
+        end
+      end
+      
+      # Invoice routes
+      resources :invoices, only: [:index, :show, :create, :update, :destroy] do
+        member do
+          patch 'mark_as_paid'
+          patch 'mark_as_partially_paid'
+          patch 'mark_as_cancelled'
+          get 'generate_pdf'
         end
       end
     end
   end
-  
-  # Root route
-  root 'api/v1/customers#index'
 end

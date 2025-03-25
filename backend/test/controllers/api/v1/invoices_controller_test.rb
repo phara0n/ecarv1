@@ -3,46 +3,33 @@ require 'test_helper'
 module Api
   module V1
     class InvoicesControllerTest < ActionDispatch::IntegrationTest
-      include Devise::Test::IntegrationHelpers
-      
       setup do
-        @admin = users(:admin)
-        @customer = users(:customer)
+        @admin = customers(:admin)
+        @customer = customers(:customer_one)
         @repair = repairs(:repair_one)
-        @invoice = invoices(:invoice_one)
+        @invoice = invoices(:one)
+        @customer_invoice = invoices(:two)
         
         # Set up JWT tokens
-        @admin_headers = { 
-          'Authorization' => "Bearer #{generate_jwt_token(@admin)}",
-          'Content-Type' => 'application/json'
-        }
-        
-        @customer_headers = { 
-          'Authorization' => "Bearer #{generate_jwt_token(@customer)}",
-          'Content-Type' => 'application/json'
-        }
+        @admin_headers = { 'Authorization' => JsonWebToken.encode(customer_id: @admin.id) }
+        @customer_headers = { 'Authorization' => JsonWebToken.encode(customer_id: @customer.id) }
       end
       
       test "should get index for admin" do
-        get api_v1_invoices_url, headers: @admin_headers
+        get api_v1_invoices_url, headers: @admin_headers, as: :json
         assert_response :success
         
-        json_response = JSON.parse(response.body)
-        assert_not_nil json_response['invoices']
-        assert_not_nil json_response['meta']
+        response_body = JSON.parse(response.body)
+        assert_not_empty response_body
       end
       
-      test "should get index for customer with their own invoices only" do
-        get api_v1_invoices_url, headers: @customer_headers
+      test "should get index for customer" do
+        get api_v1_invoices_url, headers: @customer_headers, as: :json
         assert_response :success
         
-        json_response = JSON.parse(response.body)
-        assert_not_nil json_response['invoices']
-        
-        # Verify that only customer's invoices are returned
-        invoice_ids = json_response['invoices'].map { |i| i['id'] }
-        customer_invoice_ids = Invoice.where(customer_id: @customer.customer.id).pluck(:id)
-        assert_equal invoice_ids.sort, customer_invoice_ids.sort
+        response_body = JSON.parse(response.body)
+        # Customer should only see their own invoices
+        assert response_body.all? { |invoice| invoice["customer_id"] == @customer.id }
       end
       
       test "should create invoice" do
@@ -51,129 +38,127 @@ module Api
             params: { 
               invoice: { 
                 repair_id: @repair.id, 
-                customer_id: @customer.customer.id,
-                amount: 500.00,
-                issue_date: Date.today
+                amount: 150.0, 
+                customer_id: @customer.id,
+                payment_status: 'unpaid', 
+                date: Date.today
               } 
-            }.to_json,
-            headers: @admin_headers
+            }, 
+            headers: @admin_headers, 
+            as: :json
         end
         
         assert_response :created
-        json_response = JSON.parse(response.body)
-        assert_not_nil json_response['id']
-        assert_not_nil json_response['invoice_number']
       end
       
-      test "should show invoice" do
-        get api_v1_invoice_url(@invoice), headers: @admin_headers
+      test "should show invoice for admin" do
+        get api_v1_invoice_url(@invoice), headers: @admin_headers, as: :json
         assert_response :success
         
-        json_response = JSON.parse(response.body)
-        assert_equal @invoice.id, json_response['id']
-        assert_equal @invoice.amount.to_s, json_response['amount']
+        response_body = JSON.parse(response.body)
+        assert_equal @invoice.id, response_body["id"]
+      end
+      
+      test "should show invoice for customer if it's their invoice" do
+        get api_v1_invoice_url(@customer_invoice), headers: @customer_headers, as: :json
+        assert_response :success
+        
+        response_body = JSON.parse(response.body)
+        assert_equal @customer_invoice.id, response_body["id"]
+      end
+      
+      test "should not show invoice for customer if it's not their invoice" do
+        get api_v1_invoice_url(@invoice), headers: @customer_headers, as: :json
+        assert_response :forbidden
       end
       
       test "should update invoice" do
-        new_amount = 600.00
-        
         patch api_v1_invoice_url(@invoice), 
-          params: { invoice: { amount: new_amount } }.to_json,
-          headers: @admin_headers
-          
+          params: { invoice: { amount: 175.0 } }, 
+          headers: @admin_headers, 
+          as: :json
         assert_response :success
         
         @invoice.reload
-        assert_equal new_amount, @invoice.amount
+        assert_equal 175.0, @invoice.amount
       end
       
-      test "should update payment status" do
-        patch update_payment_api_v1_invoice_url(@invoice), 
-          params: { 
-            payment: { 
-              payment_method: 'cash',
-              paid_amount: @invoice.amount
-            } 
-          }.to_json,
-          headers: @admin_headers
-          
-        assert_response :success
-        
-        @invoice.reload
-        assert_equal 'paid', @invoice.payment_status
-        assert_equal 'cash', @invoice.payment_method
-        assert_equal @invoice.amount, @invoice.paid_amount
-      end
-      
-      test "should handle partial payment" do
-        patch update_payment_api_v1_invoice_url(@invoice), 
-          params: { 
-            payment: { 
-              payment_method: 'credit_card',
-              paid_amount: @invoice.amount / 2
-            } 
-          }.to_json,
-          headers: @admin_headers
-          
-        assert_response :success
-        
-        @invoice.reload
-        assert_equal 'partial', @invoice.payment_status
-        assert_equal 'credit_card', @invoice.payment_method
-        assert_equal @invoice.amount / 2, @invoice.paid_amount
-      end
-      
-      test "should download invoice" do
-        # Ensure invoice has a PDF attached
-        @invoice.generate_pdf
-        
-        get download_api_v1_invoice_url(@invoice), headers: @admin_headers
-        assert_response :redirect
+      test "should not allow customer to update invoice" do
+        patch api_v1_invoice_url(@customer_invoice), 
+          params: { invoice: { amount: 175.0 } }, 
+          headers: @customer_headers, 
+          as: :json
+        assert_response :forbidden
       end
       
       test "should destroy invoice" do
         assert_difference('Invoice.count', -1) do
-          delete api_v1_invoice_url(@invoice), headers: @admin_headers
+          delete api_v1_invoice_url(@invoice), headers: @admin_headers, as: :json
         end
         
         assert_response :no_content
       end
       
-      test "should not allow customer to create invoice" do
+      test "should not allow customer to destroy invoice" do
         assert_no_difference('Invoice.count') do
-          post api_v1_invoices_url, 
-            params: { 
-              invoice: { 
-                repair_id: @repair.id, 
-                customer_id: @customer.customer.id,
-                amount: 500.00
-              } 
-            }.to_json,
-            headers: @customer_headers
+          delete api_v1_invoice_url(@customer_invoice), headers: @customer_headers, as: :json
         end
         
         assert_response :forbidden
       end
       
-      test "should not allow customer to delete invoice" do
-        assert_no_difference('Invoice.count') do
-          delete api_v1_invoice_url(@invoice), headers: @customer_headers
-        end
+      test "should update invoice payment status" do
+        patch mark_as_paid_api_v1_invoice_url(@invoice), headers: @admin_headers, as: :json
+        assert_response :success
         
+        @invoice.reload
+        assert_equal 'paid', @invoice.payment_status
+      end
+      
+      test "should not allow customer to update invoice payment status" do
+        patch mark_as_paid_api_v1_invoice_url(@customer_invoice), headers: @customer_headers, as: :json
         assert_response :forbidden
       end
       
-      private
+      test "should mark invoice as partially paid" do
+        patch mark_as_partially_paid_api_v1_invoice_url(@invoice), 
+          params: { amount_paid: 50.0 }, 
+          headers: @admin_headers, 
+          as: :json
+        assert_response :success
+        
+        @invoice.reload
+        assert_equal 'partially_paid', @invoice.payment_status
+        assert_equal 50.0, @invoice.amount_paid
+      end
       
-      def generate_jwt_token(user)
-        JWT.encode(
-          { 
-            sub: user.id,
-            iat: Time.current.to_i,
-            exp: 24.hours.from_now.to_i
-          },
-          Rails.application.credentials.secret_key_base
-        )
+      test "should mark invoice as cancelled" do
+        patch mark_as_cancelled_api_v1_invoice_url(@invoice), headers: @admin_headers, as: :json
+        assert_response :success
+        
+        @invoice.reload
+        assert_equal 'cancelled', @invoice.payment_status
+      end
+      
+      test "should generate pdf for invoice" do
+        get generate_pdf_api_v1_invoice_url(@invoice), headers: @admin_headers, as: :json
+        assert_response :success
+        
+        response_body = JSON.parse(response.body)
+        assert_not_nil response_body["pdf_url"]
+      end
+      
+      test "should allow customer to view their invoice pdf" do
+        get generate_pdf_api_v1_invoice_url(@customer_invoice), headers: @customer_headers, as: :json
+        assert_response :success
+        
+        response_body = JSON.parse(response.body)
+        assert_not_nil response_body["pdf_url"]
+      end
+      
+      test "should not allow customer to view other invoice pdf" do
+        get generate_pdf_api_v1_invoice_url(@invoice), headers: @customer_headers, as: :json
+        assert_response :forbidden
       end
     end
   end

@@ -1,0 +1,13 @@
+# Vehicles fixture for testing
+
+vehicle_one:
+  id: 1
+  customer: customer_one
+  brand: BMW
+  model: 3 Series
+  year: 2020
+  license_plate: 123 TUN 456
+  current_mileage: 30000
+  average_daily_usage: 45
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %> 

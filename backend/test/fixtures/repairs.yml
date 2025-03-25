@@ -1,0 +1,29 @@
+# Repairs fixture for testing
+
+repair_one:
+  id: 1
+  vehicle: vehicle_one
+  description: Oil change and filter replacement
+  start_date: <%= Date.current %>
+  date: <%= Date.current %>
+  cost: 150.00
+  status: completed
+  next_service_due_date: <%= 6.months.from_now.to_date %>
+  next_service_description: Major service
+  notes: Customer requested synthetic oil
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %>
+  
+repair_two:
+  id: 2
+  vehicle: vehicle_one
+  description: Brake pad replacement
+  start_date: <%= Date.current %>
+  date: <%= Date.current %>
+  cost: 200.00
+  status: completed
+  next_service_due_date: <%= 12.months.from_now.to_date %>
+  next_service_description: Brake fluid flush
+  notes: Front and rear brake pads replaced
+  created_at: <%= Time.current %>
+  updated_at: <%= Time.current %> 

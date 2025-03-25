@@ -26,12 +26,20 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_25_182624) do
   create_table "invoices", force: :cascade do |t|
     t.bigint "repair_id", null: false
     t.decimal "amount"
-    t.string "payment_status"
     t.string "pdf_document"
     t.decimal "vat_amount"
     t.string "payment_method"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "invoice_number", null: false
+    t.date "issue_date", default: -> { "CURRENT_DATE" }, null: false
+    t.date "due_date"
+    t.integer "payment_status", default: 0
+    t.bigint "customer_id"
+    t.decimal "paid_amount", precision: 10, scale: 2, default: "0.0"
+    t.date "payment_date"
+    t.index ["customer_id"], name: "index_invoices_on_customer_id"
+    t.index ["invoice_number"], name: "index_invoices_on_invoice_number", unique: true
     t.index ["repair_id"], name: "index_invoices_on_repair_id"
   end
 
@@ -65,6 +73,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_25_182624) do
     t.index ["customer_id"], name: "index_vehicles_on_customer_id"
   end
 
+  add_foreign_key "invoices", "customers"
   add_foreign_key "invoices", "repairs"
   add_foreign_key "repairs", "vehicles"
   add_foreign_key "vehicles", "customers"
