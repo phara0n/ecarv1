@@ -3,6 +3,9 @@
 ## Overview
 This application is designed for a garage in Tunisia to manage customer vehicle repairs, invoices, and service history. It provides a mobile app for customers (iOS & Android) and a web interface for administrators.
 
+## Repository
+- **GitHub:** [https://github.com/phara0n/ecarv1](https://github.com/phara0n/ecarv1)
+
 ## Project Structure
 - `backend/` - Ruby on Rails API server
   - RESTful API endpoints for managing customers, vehicles, repairs, and invoices
@@ -47,6 +50,7 @@ This application is designed for a garage in Tunisia to manage customer vehicle 
 - [x] Implement Flutter models and services
 - [x] Design app theme based on brand specifications
 - [x] Create basic screens for the mobile app
+- [x] Initialize Git repository and push to GitHub
 
 ## Next Steps
 - [ ] Complete customer mobile app screens
@@ -72,6 +76,12 @@ This application is designed for a garage in Tunisia to manage customer vehicle 
 2. Run `flutter pub get` to install dependencies
 3. Update the API base URL in the configuration
 4. Run the app with `flutter run`
+
+### Development Workflow
+1. Clone the repository: `git clone https://github.com/phara0n/ecarv1.git`
+2. Make your changes following the project structure guidelines
+3. Commit your changes: `git commit -m "Description of changes"`
+4. Push to GitHub: `git push origin master`
 
 ## License
 Proprietary software for eCar Garage. 
