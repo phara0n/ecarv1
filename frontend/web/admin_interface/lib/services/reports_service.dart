@@ -17,27 +17,27 @@ class ReportsService {
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
+        final data = json.decode(response.body);
         return ReportData.fromJson(data);
       } else {
-        throw Exception('Failed to load report data');
+        throw Exception('Failed to load report data: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error fetching report data: $e');
     }
   }
 
-  Future<List<ServiceStat>> getServiceStats() async {
+  Future<ServiceStats> getServiceStats() async {
     try {
       final response = await http.get(
         Uri.parse('$_baseUrl/reports/service_stats'),
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => ServiceStat.fromJson(json)).toList();
+        final data = json.decode(response.body);
+        return ServiceStats.fromJson(data);
       } else {
-        throw Exception('Failed to load service stats');
+        throw Exception('Failed to load service stats: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error fetching service stats: $e');
@@ -56,12 +56,63 @@ class ReportsService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => RevenueData.fromJson(json)).toList();
+        return data.map((item) => RevenueData.fromJson(item)).toList();
       } else {
-        throw Exception('Failed to load revenue data');
+        throw Exception('Failed to load revenue data: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error fetching revenue data: $e');
+    }
+  }
+
+  Future<List<PopularService>> getPopularServices() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/reports/popular_services'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((item) => PopularService.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load popular services: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching popular services: $e');
+    }
+  }
+
+  Future<List<CustomerStats>> getCustomerStats() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/reports/customer_stats'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((item) => CustomerStats.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load customer stats: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching customer stats: $e');
+    }
+  }
+
+  Future<List<VehicleStats>> getVehicleStats() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$_baseUrl/reports/vehicle_stats'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((item) => VehicleStats.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load vehicle stats: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching vehicle stats: $e');
     }
   }
 } 
