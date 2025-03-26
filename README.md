@@ -1,143 +1,70 @@
-# eCar Garage App
+# eCar Garage Management Application
 
-A complete garage management system with a Rails API backend and Flutter frontend.
+A comprehensive garage management system for a Tunisian auto repair shop specializing in BMW, Mercedes-Benz, and Volkswagen Group vehicles.
 
-## Project Structure
+## Overview
 
-- `/backend`: Ruby on Rails API
-- `/frontend/flutter/ecar_app`: Flutter mobile application
-- `/frontend/web/admin_interface`: Flutter web admin interface
+This application allows garage administrators to manage customers, vehicles, repairs, and invoices through a web-based admin interface. Customers can access their vehicle history and invoices through a mobile app available on both iOS and Android.
 
-## Backend (Rails API)
+## Quick Start
 
-The backend is a Ruby on Rails API that provides endpoints for managing:
-
-- Customers and authentication
-- Vehicles
-- Repairs
-- Invoices and payments
-- Push notifications
-
-### Authentication
-
-The application uses JWT tokens for authentication. Customers can have either an 'admin' or 'customer' role.
-
-### Testing
-
-Run the backend tests with:
+The easiest way to run both the backend and frontend for development is to use the provided startup script:
 
 ```bash
-cd backend
-RAILS_ENV=test rails test
+# From the project root
+chmod +x start_apps.sh  # Make sure the script is executable
+./start_apps.sh
 ```
 
-## Frontend (Flutter Mobile App)
+This script:
+1. Cleans up any existing processes on ports 3000 and 8090
+2. Fixes necessary permissions for log and tmp directories
+3. Starts the Rails backend on port 3000
+4. Builds and serves the Flutter web admin interface on port 8090
 
-The Flutter app provides a mobile interface for:
+After running the script, you can access:
+- Backend API: http://localhost:3000
+- Admin Interface: http://localhost:8090
 
-- Authentication (login/logout)
-- Customer dashboard
-- Vehicle management
-- Repair tracking
-- Invoice viewing and payment
-- Push notification preferences
+Admin login credentials:
+- Email: admin@ecar.tn
+- Password: password123
 
-### Testing
+## Manual Setup
 
-Run the Flutter tests with:
+If you prefer to run each component separately, follow these steps:
 
-```bash
-cd frontend/flutter/ecar_app
-flutter test
-```
-
-## Admin Web Interface
-
-The web-based admin interface allows garage administrators to:
-
-- Manage customers and their vehicles
-- Track and update repair status
-- Create and manage invoices
-- View statistics and reports
-- Send push notifications to customers
-
-### Features
-
-- Responsive design for desktop and mobile
-- Dashboard with key business metrics
-- Complete repair management system
-- Invoice generation and management
-- Customer management
-
-### Running the Web Interface
-
-```bash
-cd frontend/web/admin_interface
-flutter pub get
-flutter run -d chrome
-```
-
-## Push Notifications
-
-The application implements push notifications using Firebase Cloud Messaging (FCM) to:
-
-- Alert customers about repair status changes
-- Send reminders for scheduled maintenance
-- Notify about invoice generation and payment due dates
-- Deliver promotional offers
-
-## Development Setup
-
-### Backend
-
-1. Install Ruby and Rails
-2. Install PostgreSQL
-3. Set up the database:
+### Backend (Rails API)
 
 ```bash
 cd backend
 bundle install
 rails db:create db:migrate db:seed
+rails s -p 3000
 ```
 
-4. Start the server:
-
-```bash
-rails s
-```
-
-### Mobile App
-
-1. Install Flutter SDK
-2. Install dependencies:
-
-```bash
-cd frontend/flutter/ecar_app
-flutter pub get
-```
-
-3. Run the app:
-
-```bash
-flutter run
-```
-
-### Web Admin Interface
-
-1. Install Flutter SDK with web support
-2. Install dependencies:
+### Admin Interface (Flutter Web)
 
 ```bash
 cd frontend/web/admin_interface
 flutter pub get
+flutter run -d web-server --web-port 8090
 ```
 
-3. Run the web app:
+## Project Structure
 
-```bash
-flutter run -d chrome
-```
+- `backend/`: Ruby on Rails API backend
+- `frontend/flutter/ecar_app/`: Flutter mobile app for customers
+- `frontend/web/admin_interface/`: Flutter web app for admin interface
+- `docs/`: Project documentation
+  - `PROJECT_TIMELINE.md`: Development timeline and milestones
+  - `PROGRESS_SUMMARY.md`: Summary of completed features
+  - `TEST_IMPLEMENTATION.md`: Testing strategy and guidelines
 
-## API Documentation
+## Development Status
 
-For API documentation, see the OpenAPI specification in `/backend/docs/api.yaml`. 
+See [PROGRESS_SUMMARY.md](docs/PROGRESS_SUMMARY.md) for the latest updates on completed features and development status.
+
+## License
+
+© 2025 eCar Garage. All rights reserved. 
