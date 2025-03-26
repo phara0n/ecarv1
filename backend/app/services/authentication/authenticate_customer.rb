@@ -1,5 +1,6 @@
 module Authentication
   class AuthenticateCustomer
+    # Using SimpleCommand gem to easily create service objects with standardized success/error handling
     prepend SimpleCommand
     
     def initialize(email, password)

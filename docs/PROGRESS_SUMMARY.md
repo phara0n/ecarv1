@@ -4,6 +4,13 @@ Last updated: April 3, 2025
 
 ## Recently Completed Features
 
+### Development Environment Improvements
+- Created an automated startup script (`start_apps.sh`) that launches both Rails backend and Flutter web app
+- Fixed database configuration issues with proper PostgreSQL user setup
+- Implemented proper cleanup processes for stale PIDs and processes
+- Added error handling and health checks to ensure services start correctly
+- Resolved authentication service dependency issues with SimpleCommand gem
+
 ### Authentication Security Improvements
 - Fixed authentication security issue in admin interface that was allowing any email with @ecar.tn domain
 - Implemented proper credential validation against the backend API
