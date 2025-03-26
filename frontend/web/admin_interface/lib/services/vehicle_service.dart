@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import '../models/vehicle.dart';
 import '../services/auth_service.dart';
+import '../config/api_config.dart';
 
 class VehicleService {
   static final VehicleService _instance = VehicleService._internal();
@@ -14,7 +15,7 @@ class VehicleService {
   VehicleService._internal();
   
   final AuthService _authService = AuthService();
-  final String _baseUrl = 'https://api.ecar.tn/api/v1';
+  final String _baseUrl = ApiConfig.baseUrl;
   
   // Get all vehicles with optional filtering and pagination
   Future<Map<String, dynamic>> getVehicles({
