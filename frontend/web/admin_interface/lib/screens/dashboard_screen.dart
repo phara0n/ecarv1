@@ -3,6 +3,9 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'customers_screen.dart';
 import 'vehicles_screen.dart';
 import 'repairs_screen.dart';
+import '../widgets/app_drawer.dart';
+import '../services/dashboard_service.dart';
+import '../models/dashboard_data.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -14,6 +17,9 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen> {
   int _selectedIndex = 0;
   bool _isSidebarCollapsed = false;
+  final DashboardService _dashboardService = DashboardService();
+  DashboardData? _dashboardData;
+  bool _isLoading = true;
   
   final List<Map<String, dynamic>> _navItems = [
     {
@@ -47,6 +53,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
       'screen': const Center(child: Text('Settings Screen - Coming Soon')),
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDashboardData();
+  }
+
+  Future<void> _loadDashboardData() async {
+    try {
+      final data = await _dashboardService.getDashboardData();
+      setState(() {
+        _dashboardData = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading dashboard data: $e')),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +126,92 @@ class _DashboardScreenState extends State<DashboardScreen> {
           Expanded(
             child: Container(
               color: Colors.grey[100],
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Welcome Section
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Welcome back, Admin!',
+                                    style: Theme.of(context).textTheme.headlineMedium,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Here\'s what\'s happening today',
+                                    style: Theme.of(context).textTheme.bodyLarge,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Quick Stats
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _buildStatCard(
+                                  'Total Customers',
+                                  _dashboardData?.totalCustomers.toString() ?? '0',
+                                  Icons.people,
+                                  Colors.blue,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _buildStatCard(
+                                  'Active Repairs',
+                                  _dashboardData?.activeRepairs.toString() ?? '0',
+                                  Icons.build,
+                                  Colors.orange,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: _buildStatCard(
+                                  'Pending Invoices',
+                                  _dashboardData?.pendingInvoices.toString() ?? '0',
+                                  Icons.receipt,
+                                  Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 24),
+
+                          // Recent Activity
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Recent Activity',
+                                        style: Theme.of(context).textTheme.titleLarge,
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          // Navigate to activity log
+                                        },
+                                        child: const Text('View All'),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                  ListView.builder(
               child: _navItems[_selectedIndex]['screen'],
             ),
           ),

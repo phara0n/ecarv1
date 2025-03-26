@@ -1,5 +1,5 @@
 name: admin_interface
-description: "eCar Garage Management Application - Admin Interface"
+description: Admin interface for eCar Garage Management System
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.2
+  sdk: '>=3.0.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -33,32 +33,41 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^1.0.2
   
   # Essential packages for the admin interface
   http: ^1.1.0
-  flutter_secure_storage: ^8.0.0
-  provider: ^6.0.5
-  shared_preferences: ^2.2.0
-  intl: ^0.19.0
+  flutter_secure_storage: ^9.0.0
+  provider: ^6.1.1
+  shared_preferences: ^2.2.2
+  intl: ^0.18.1
   flutter_localizations:
     sdk: flutter
   
   # UI related packages
-  google_fonts: ^4.0.4
-  flutter_svg: ^2.0.7
-  data_table_2: ^2.5.10
-  fl_chart: ^0.64.0
-  file_picker: ^5.3.3
-  pdf: ^3.10.4
+  google_fonts: ^6.1.0
+  flutter_svg: ^2.0.9
+  fl_chart: ^0.65.0
+  image_picker: ^1.0.7
+  path_provider: ^2.1.2
+  url_launcher: ^6.2.2
+  pdf: ^3.10.7
   printing: ^5.11.1
-  url_launcher: ^6.1.12
+  file_picker: ^6.1.1
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+  flutter_staggered_grid_view: ^0.7.0
+  flutter_slidable: ^3.0.1
+  flutter_animate: ^4.5.0
+  flutter_native_splash: ^2.3.8
+  flutter_launcher_icons: ^0.13.1
   
   # State management
   flutter_riverpod: ^2.4.10
   
   # Responsive design for web
   responsive_framework: ^1.1.1
+  mocktail: ^1.0.4
 
 dev_dependencies:
   flutter_test:
@@ -69,7 +78,11 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+  flutter_lints: ^2.0.0
+  build_runner: ^2.4.8
+  json_serializable: ^6.7.1
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.3.8
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -86,6 +99,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
+    - assets/fonts/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:responsive_framework/responsive_framework.dart';
-import '../models/customer.dart';
-import '../services/customer_service.dart';
-import '../widgets/loading_indicator.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:data_table_2/data_table_2.dart';
+import '../models/customer.dart';
+import '../models/vehicle.dart';
+import '../models/repair.dart';
+import '../services/customer_service.dart';
+import '../services/vehicle_service.dart';
+import '../services/repair_service.dart';
+import '../widgets/loading_indicator.dart';
 import '../widgets/stat_card.dart';
 
 class CustomersScreen extends StatefulWidget {
@@ -20,6 +24,8 @@ class CustomersScreen extends StatefulWidget {
 class _CustomersScreenState extends State<CustomersScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final CustomerService _customerService = CustomerService();
+  final VehicleService _vehicleService = VehicleService();
+  final RepairService _repairService = RepairService();
   
   // State for the customer overview
   bool _isLoadingStats = true;
@@ -48,10 +54,17 @@ class _CustomersScreenState extends State<CustomersScreen> with SingleTickerProv
   String _formNotes = '';
   bool _formIsActive = true;
   
+  // Add new state variables for bulk operations and detailed view
+  Set<int> _selectedCustomers = {};
+  bool _showDetailedView = false;
+  Customer? _selectedCustomer;
+  List<Vehicle> _customerVehicles = [];
+  List<Repair> _customerRepairs = [];
+  
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadStatistics();
     _loadCustomers();
   }
@@ -379,6 +392,99 @@ class _CustomersScreenState extends State<CustomersScreen> with SingleTickerProv
     );
   }
   
+  // Add method to load customer details
+  Future<void> _loadCustomerDetails(Customer customer) async {
+    setState(() {
+      _selectedCustomer = customer;
+      _showDetailedView = true;
+    });
+    
+    try {
+      // Load customer's vehicles
+      final vehiclesResult = await _vehicleService.getVehicles(
+        customerId: customer.id,
+        perPage: 100,
+      );
+      
+      // Load customer's repairs
+      final repairsResult = await _repairService.getRepairs(
+        customerId: customer.id,
+        perPage: 100,
+      );
+      
+      setState(() {
+        _customerVehicles = vehiclesResult['vehicles'] as List<Vehicle>;
+        _customerRepairs = repairsResult['repairs'] as List<Repair>;
+      });
+    } catch (e) {
+      _showSnackBar('Failed to load customer details: ${e.toString()}');
+    }
+  }
+
+  // Add method for bulk operations
+  Future<void> _performBulkAction(String action) async {
+    if (_selectedCustomers.isEmpty) {
+      _showSnackBar('Please select customers first');
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Confirm ${action.capitalize()}'),
+        content: Text('Are you sure you want to $action ${_selectedCustomers.length} customers?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(action.capitalize()),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        switch (action) {
+          case 'activate':
+            await Future.wait(
+              _selectedCustomers.map((id) => 
+                _customerService.toggleCustomerStatus(id, true)
+              )
+            );
+            break;
+          case 'deactivate':
+            await Future.wait(
+              _selectedCustomers.map((id) => 
+                _customerService.toggleCustomerStatus(id, false)
+              )
+            );
+            break;
+          case 'delete':
+            await Future.wait(
+              _selectedCustomers.map((id) => 
+                _customerService.deleteCustomer(id)
+              )
+            );
+            break;
+        }
+        
+        setState(() {
+          _selectedCustomers.clear();
+        });
+        
+        _showSnackBar('Bulk operation completed successfully');
+        _loadCustomers();
+        _loadStatistics();
+      } catch (e) {
+        _showSnackBar('Failed to perform bulk operation: ${e.toString()}');
+      }
+    }
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -389,6 +495,7 @@ class _CustomersScreenState extends State<CustomersScreen> with SingleTickerProv
           tabs: const [
             Tab(text: 'Overview'),
             Tab(text: 'Customer List'),
+            Tab(text: 'Details'),
           ],
         ),
       ),
@@ -397,12 +504,12 @@ class _CustomersScreenState extends State<CustomersScreen> with SingleTickerProv
         children: [
           _buildOverviewTab(),
           _buildCustomerListTab(),
+          _buildCustomerDetailTab(),
         ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showCustomerForm(),
         child: const Icon(Icons.add),
-        tooltip: 'Add New Customer',
       ),
     );
   }
@@ -536,6 +643,31 @@ class _CustomersScreenState extends State<CustomersScreen> with SingleTickerProv
   Widget _buildCustomerListTab() {
     return Column(
       children: [
+        if (_selectedCustomers.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Text('${_selectedCustomers.length} selected'),
+                const Spacer(),
+                TextButton.icon(
+                  icon: const Icon(Icons.check_circle),
+                  label: const Text('Activate'),
+                  onPressed: () => _performBulkAction('activate'),
+                ),
+                TextButton.icon(
+                  icon: const Icon(Icons.cancel),
+                  label: const Text('Deactivate'),
+                  onPressed: () => _performBulkAction('deactivate'),
+                ),
+                TextButton.icon(
+                  icon: const Icon(Icons.delete),
+                  label: const Text('Delete'),
+                  onPressed: () => _performBulkAction('delete'),
+                ),
+              ],
+            ),
+          ),
         // Filters section
         Padding(
           padding: const EdgeInsets.all(16.0),
@@ -1070,6 +1202,110 @@ class _CustomersScreenState extends State<CustomersScreen> with SingleTickerProv
           ],
         );
       }).toList(),
+    );
+  }
+
+  // Add a detailed customer view tab
+  Widget _buildCustomerDetailTab() {
+    if (_selectedCustomer == null) {
+      return const Center(
+        child: Text('Select a customer to view details'),
+      );
+    }
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                child: Text(_selectedCustomer!.initials),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _selectedCustomer!.name,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                    Text(
+                      _selectedCustomer!.email,
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () => _showCustomerForm(customer: _selectedCustomer),
+              ),
+            ],
+          ),
+          const Divider(height: 32),
+          Text(
+            'Contact Information',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+          ListTile(
+            leading: const Icon(Icons.phone),
+            title: Text(_selectedCustomer!.phone ?? 'No phone number'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.location_on),
+            title: Text(_selectedCustomer!.address ?? 'No address'),
+            subtitle: Text('${_selectedCustomer!.city ?? ''} ${_selectedCustomer!.postalCode ?? ''}'),
+          ),
+          const Divider(height: 32),
+          Text(
+            'Vehicles (${_customerVehicles.length})',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _customerVehicles.length,
+            itemBuilder: (context, index) {
+              final vehicle = _customerVehicles[index];
+              return ListTile(
+                leading: const Icon(Icons.directions_car),
+                title: Text('${vehicle.brand} ${vehicle.model}'),
+                subtitle: Text('License Plate: ${vehicle.licensePlate}'),
+                trailing: Text(vehicle.year.toString()),
+              );
+            },
+          ),
+          const Divider(height: 32),
+          Text(
+            'Recent Repairs (${_customerRepairs.length})',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _customerRepairs.length,
+            itemBuilder: (context, index) {
+              final repair = _customerRepairs[index];
+              return ListTile(
+                leading: const Icon(Icons.build),
+                title: Text(repair.description),
+                subtitle: Text(DateFormat('MMM d, yyyy').format(repair.date)),
+                trailing: Text(NumberFormat.currency(
+                  symbol: 'TND',
+                  decimalDigits: 2,
+                ).format(repair.cost)),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 } 

@@ -4,6 +4,14 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'screens/login_screen.dart';
 import 'screens/dashboard_screen.dart';
+import 'screens/customers_screen.dart';
+import 'screens/vehicles_screen.dart';
+import 'screens/repairs_screen.dart';
+import 'screens/invoices_screen.dart';
+import 'screens/reports_screen.dart';
+import 'screens/settings_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/notifications_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -108,15 +116,20 @@ class AdminApp extends StatelessWidget {
         Locale('ar'), // Arabic
       ],
       
-      // Define routes
+      // Define routes - use initialRoute instead of home
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginScreen(),
         '/dashboard': (context) => const DashboardScreen(),
+        '/customers': (context) => const CustomersScreen(),
+        '/vehicles': (context) => const VehiclesScreen(),
+        '/repairs': (context) => const RepairsScreen(),
+        '/invoices': (context) => const InvoicesScreen(),
+        '/reports': (context) => const ReportsScreen(),
+        '/settings': (context) => const SettingsScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/notifications': (context) => const NotificationsScreen(),
       },
-      
-      // Start with the login screen
-      home: const LoginScreen(),
     );
   }
 }

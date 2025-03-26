@@ -90,7 +90,7 @@ class Customer {
   }
 
   // Helper for getting the first letter for avatar
-  String getInitials() {
+  String get initials {
     final nameParts = name.split(' ');
     if (nameParts.length > 1) {
       return '${nameParts[0][0]}${nameParts[1][0]}'.toUpperCase();
@@ -110,7 +110,7 @@ class Customer {
         radius: radius,
         backgroundColor: Colors.blue.shade800,
         child: Text(
-          getInitials(),
+          initials,
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
