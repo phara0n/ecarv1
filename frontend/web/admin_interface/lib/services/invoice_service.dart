@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/invoice.dart';
 import '../services/auth_service.dart';
+import '../config/api_config.dart';
 
 class InvoiceService {
   static final InvoiceService _instance = InvoiceService._internal();
@@ -13,7 +14,7 @@ class InvoiceService {
   InvoiceService._internal();
   
   final AuthService _authService = AuthService();
-  final String _baseUrl = 'https://api.ecar.tn/api/v1';
+  final String _baseUrl = ApiConfig.baseUrl;
   
   // Get all invoices with optional filtering and pagination
   Future<Map<String, dynamic>> getInvoices({

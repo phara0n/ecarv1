@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../config/api_config.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -16,7 +17,7 @@ class AuthService {
   final _secureStorage = const FlutterSecureStorage();
   
   // Base URL for the API - using local Rails server
-  final String _baseUrl = 'http://localhost:3000/api/v1';
+  final String _baseUrl = ApiConfig.baseUrl;
   
   // Key for storing the auth token
   static const String _tokenKey = 'admin_auth_token';
