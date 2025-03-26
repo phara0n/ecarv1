@@ -650,27 +650,31 @@ class _CustomersScreenState extends State<CustomersScreen> with SingleTickerProv
   
   // Build the top cities chart
   Widget _buildTopCitiesChart() {
-    final topCities = _statistics['top_cities'] as Map<String, dynamic>? ?? {};
+    final topCities = _statistics['top_cities'] as List<dynamic>? ?? [];
     
     if (topCities.isEmpty) {
       return const Center(child: Text('No data available'));
     }
     
-    final entries = topCities.entries.toList()
-      ..sort((a, b) => (b.value as int).compareTo(a.value as int));
+    // Process the list format [{'name': 'City', 'count': Number}]
+    final citiesList = topCities.map((city) => {
+      'name': city['name'] as String,
+      'count': city['count'] as int
+    }).toList()
+      ..sort((a, b) => (b['count'] as int).compareTo(a['count'] as int));
     
     final barGroups = <BarChartGroupData>[];
     final titles = <String>[];
     
-    for (int i = 0; i < entries.length && i < 5; i++) {
-      final entry = entries[i];
-      titles.add(entry.key);
+    for (int i = 0; i < citiesList.length && i < 5; i++) {
+      final city = citiesList[i];
+      titles.add(city['name'] as String);
       barGroups.add(
         BarChartGroupData(
           x: i,
           barRods: [
             BarChartRodData(
-              toY: (entry.value as int).toDouble(),
+              toY: (city['count'] as int).toDouble(),
               color: Colors.blue,
               width: 20,
               borderRadius: const BorderRadius.only(
@@ -686,7 +690,7 @@ class _CustomersScreenState extends State<CustomersScreen> with SingleTickerProv
     return BarChart(
       BarChartData(
         alignment: BarChartAlignment.spaceAround,
-        maxY: (entries.isNotEmpty ? (entries.first.value as int).toDouble() * 1.2 : 10),
+        maxY: (citiesList.isNotEmpty ? (citiesList.first['count'] as int).toDouble() * 1.2 : 10),
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(

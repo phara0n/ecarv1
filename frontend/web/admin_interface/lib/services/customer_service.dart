@@ -14,7 +14,7 @@ class CustomerService {
   CustomerService._internal();
   
   final AuthService _authService = AuthService();
-  final String _baseUrl = 'https://api.ecar.tn/api/v1';
+  final String _baseUrl = 'http://localhost:3000/api/v1';
   
   // Get all customers with optional filtering and pagination
   Future<Map<String, dynamic>> getCustomers({
@@ -291,72 +291,71 @@ class CustomerService {
   
   Map<String, dynamic> _getMockStatistics() {
     return {
-      'total_customers': 145,
-      'active_customers': 128,
-      'inactive_customers': 17,
-      'new_last_month': 12,
-      'total_revenue': 94250.75,
-      'average_revenue_per_customer': 650.0,
-      'top_cities': {
-        'Tunis': 45,
-        'Sousse': 28,
-        'Sfax': 22,
-        'Bizerte': 15,
-        'Monastir': 13,
-      },
-      'vehicles_per_customer': {
-        '1': 86,
-        '2': 42,
-        '3+': 17,
+      'total_customers': 35,
+      'active_customers': 30,
+      'inactive_customers': 5,
+      'new_last_month': 8,
+      'total_revenue': 43775.25,
+      'customer_growth_percentage': 12.5,
+      'average_vehicles_per_customer': 1.8,
+      'average_repairs_per_customer': 3.2,
+      'average_total_spent': 1250.75,
+      'top_cities': [
+        {'name': 'Tunis', 'count': 15},
+        {'name': 'Sfax', 'count': 8},
+        {'name': 'Sousse', 'count': 6},
+        {'name': 'Bizerte', 'count': 4},
+        {'name': 'Monastir', 'count': 2}
+      ],
+      'customer_growth': {
+        'Jan': 3,
+        'Feb': 5,
+        'Mar': 2,
+        'Apr': 8,
+        'May': 4,
+        'Jun': 6,
+        'Jul': 3,
+        'Aug': 5,
+        'Sep': 7,
+        'Oct': 4,
+        'Nov': 6,
+        'Dec': 9
       },
       'recent_customers': [
         {
-          'id': 1,
           'name': 'Ahmed Ben Ali',
-          'email': 'ahmed.benali@gmail.com',
-          'created_at': '2023-03-15',
+          'email': 'ahmed@example.com',
+          'created_at': DateTime.now().subtract(const Duration(days: 2)).toIso8601String(),
           'vehicle_count': 2,
-          'is_active': true,
+          'is_active': true
         },
         {
-          'id': 2,
           'name': 'Sonia Mansour',
-          'email': 'sonia.mansour@gmail.com',
-          'created_at': '2023-03-14',
+          'email': 'sonia@example.com',
+          'created_at': DateTime.now().subtract(const Duration(days: 5)).toIso8601String(),
           'vehicle_count': 1,
-          'is_active': true,
+          'is_active': true
         },
         {
-          'id': 3,
-          'name': 'Karim Jebali',
-          'email': 'karim.jebali@gmail.com',
-          'created_at': '2023-03-10',
+          'name': 'Mohamed Karim',
+          'email': 'mohamed@example.com',
+          'created_at': DateTime.now().subtract(const Duration(days: 7)).toIso8601String(),
           'vehicle_count': 3,
-          'is_active': true,
+          'is_active': true
         },
         {
-          'id': 4,
           'name': 'Leila Trabelsi',
-          'email': 'leila.trabelsi@gmail.com',
-          'created_at': '2023-03-05',
+          'email': 'leila@example.com',
+          'created_at': DateTime.now().subtract(const Duration(days: 10)).toIso8601String(),
           'vehicle_count': 1,
-          'is_active': false,
-        },
+          'is_active': false
+        }
       ],
-      'customer_growth': {
-        'Jan': 8,
-        'Feb': 10,
-        'Mar': 12,
-        'Apr': 9,
-        'May': 15,
-        'Jun': 18,
-        'Jul': 14,
-        'Aug': 9,
-        'Sep': 11,
-        'Oct': 13,
-        'Nov': 10,
-        'Dec': 16,
-      },
+      'vehicles_per_customer': {
+        '1 Vehicle': 20,
+        '2 Vehicles': 10,
+        '3+ Vehicles': 5
+      }
     };
   }
 } 
